@@ -1,0 +1,10 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
+
+PROJECT(niucompiler)
+SET(CMAKE_CXX_STANDARD 17)
+
+ADD_EXECUTABLE(niucompiler 
+    "source/main.cpp"
+)
+
+TARGET_INCLUDE_DIRECTORIES(niucompiler PUBLIC "source")
