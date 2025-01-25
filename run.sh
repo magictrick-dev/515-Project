@@ -1,2 +1,2 @@
-bin/niucompiler ./tests/test.txt
+./ncc ./tests/test.txt
 

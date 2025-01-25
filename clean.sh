@@ -5,3 +5,4 @@ rm ./CMakeCache.txt
 rm ./cmake_install.cmake
 rm ./Makefile
 rm compile_commands.json
+rm ncc

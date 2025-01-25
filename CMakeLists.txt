@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
 
-PROJECT(niucompiler)
+PROJECT(ncc)
 SET(CMAKE_CXX_STANDARD 17)
 
 # Enable compile_commands.json
@@ -16,10 +16,10 @@ IF(UNIX)
     )
 ENDIF(UNIX)
 
-ADD_EXECUTABLE(niucompiler 
+ADD_EXECUTABLE(ncc
     "source/main.cpp"
 
     ${PLATFORM_FILES}
 )
 
-TARGET_INCLUDE_DIRECTORIES(niucompiler PUBLIC "source")
+TARGET_INCLUDE_DIRECTORIES(ncc PUBLIC "source")
