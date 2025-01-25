@@ -9,14 +9,24 @@
 //
 // Represents the input source file that the user provides. In order for any file
 // to be loaded, you must manually invoke the load() method so that the buffer is
-// populated with the contents of the file. This operation will use virtual allocation
-// methods in order to provide the best performance possible.
+// populated with the contents of the file.
 //
-// It should also be noted that there are copy constructors/operators in place, but
-// they will *always* attempt a new virtual allocation. Therefore, it isn't wise
-// to pass this around too much, as it will be a performance hit. The reason this is
-// in place is so that the destructor doesn't accidently yeet the memory of a copy
-// when the user does do something silly, like pass it around.
+// Once the file is loaded, you can use the get and advance methods to pull individual
+// characters off the buffer. We use a simple file pointer to dictate which byte we are
+// at in the buffer, with unget effectively rewinding the file pointer back one.
+//
+// A consequence of this behavior means that manually tracking the line and column
+// position becomes non-trivial since we can't unwind the file pointer and know exactly
+// which column it was in when we read the character.
+//
+//      1.  We could use a stack for the column and line counts. Effective.
+//      2.  We track only the line count and use a method to manually calculate the
+//          the current column. Also effective, but somewhat computationally costly
+//          when we need to query the column.
+//
+// Option 2 makes sense since we only query the column when we have an error to output.
+// How often do errors occur? Not very often. This way we prevent unnecessary STL dependencies
+// for edge-case behavior that only requires a small amount of spinning over an array.
 //
 
 class SourceBuffer
@@ -50,6 +60,7 @@ class SourceBuffer
 
         inline string       get_line_string() const;
         inline string       get_line_string_at(i32 cursor) const;
+        inline string       get_line_string_from(i32 line, i32 column) const;
 
     protected:
         buffer  file_buffer;
@@ -407,6 +418,35 @@ get_line_string_at(i32 cursor) const
         result += ((char*)this->file_buffer.data)[i];
 
     return result;
+
+}
+
+inline string SourceBuffer::
+get_line_string_from(i32 line, i32 column) const
+{
+
+    ENSURE(line > 0);
+    ENSURE(column > 0);
+
+    // Calculates the cursor.
+    i32 lines = 0;
+    i32 offset = 0;
+    
+    for (offset = 0; offset < this->file_size; ++offset)
+    {
+
+        if (((char*)this->file_buffer.data)[offset] == '\n')
+            lines++;
+
+        if (lines == line)
+            break;
+
+    }
+
+    i32 start = offset + column - 1;
+    string result = get_line_string_at(start);
+    return result;
+
 
 }
 
