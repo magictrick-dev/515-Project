@@ -49,6 +49,7 @@ class SourceBuffer
         inline bool         is_eol() const;
 
         inline bool         peek(char *c) const;
+        //inline bool         peek(char *c, i32 offset) const; // TODO(Chris);
         inline bool         get(char *c);
         inline bool         unget(char *c);
         inline bool         advance();
