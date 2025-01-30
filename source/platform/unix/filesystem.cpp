@@ -3,6 +3,41 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+bool
+fileystem_path_is_valid(ccptr path)
+{
+
+    // Check if the path is valid.
+    return access(path, F_OK) != -1;
+
+
+}
+
+bool
+filesystem_path_exists(ccptr path)
+{
+
+    // Check if the path is a directory.
+    struct stat path_stat;
+    if (stat(path, &path_stat) == 0)
+    {
+        return S_ISDIR(path_stat.st_mode);
+    }
+
+    return false;
+
+}
+
+bool
+filesystem_file_exists(ccptr file_name)
+{
+
+    // Check if the file exists.
+    struct stat file_stat;
+    return stat(file_name, &file_stat) == 0;
+
+}
+
 bool 
 filesystem_get_file_size(ccptr file_name, u64 *file_size)
 {
