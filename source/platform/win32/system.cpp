@@ -1,7 +1,7 @@
 #include <platform/system.hpp>
 #include <windows.h>
 
-buffer 
+memory_buffer 
 system_virtual_allocate(vptr offset, u64 size)
 {
     
@@ -12,7 +12,7 @@ system_virtual_allocate(vptr offset, u64 size)
     LPVOID result = VirtualAlloc(offset, required_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
     ENSURE(result != nullptr);
 
-    buffer buff = {0};
+    memory_buffer buff = {0};
     buff.data   = result;
     buff.size   = required_size;
 

@@ -26,6 +26,15 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(ncc
     "source/main.cpp"
+    "source/buffer.hpp"
+    "source/definitions.hpp"
+
+    "source/compiler/errors.hpp"
+    "source/compiler/lexer.hpp"
+    "source/compiler/lexer.cpp"
+
+    "source/platform/filesystem.hpp"
+    "source/platform/system.hpp"
 
     ${PLATFORM_FILES}
 )

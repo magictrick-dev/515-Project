@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
-buffer      
+memory_buffer      
 system_virtual_allocate(vptr offset, u64 size)
 {
 
@@ -24,7 +24,7 @@ system_virtual_allocate(vptr offset, u64 size)
     ENSURE_PTR(ptr);
 
     // Return the buffer.
-    buffer result = {0};
+    memory_buffer result = {0};
     result.data = ptr;
     result.size = actual_size;
 

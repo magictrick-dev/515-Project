@@ -2,10 +2,10 @@
 #define SOURCE_BUFFER_HPP
 #include <definitions.hpp>
 
-typedef struct buffer
+typedef struct memory_buffer
 {
     vptr data;
     u64 size;
-} buffer;
+} memory_buffer;
 
 #endif

@@ -59,7 +59,7 @@ filesystem_get_file_size(ccptr file_name, u64 *file_size)
 }
 
 bool
-filesystem_read_entire_file(ccptr file_name, buffer *buff)
+filesystem_read_entire_file(ccptr file_name, memory_buffer *buff)
 {
 
     ENSURE_PTR(buff);
@@ -94,7 +94,7 @@ filesystem_read_entire_file(ccptr file_name, buffer *buff)
 }
 
 bool
-filesystem_write_entire_file(ccptr file_name, buffer *buff)
+filesystem_write_entire_file(ccptr file_name, memory_buffer *buff)
 {
 
     ENSURE_PTR(buff);

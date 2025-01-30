@@ -3,7 +3,6 @@
 #include <buffer.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
-#include <compiler/sourcebuffer.hpp>
 #include <compiler/lexer.hpp>
 
 int
