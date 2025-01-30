@@ -16,7 +16,13 @@ main(int argc, char ** argv)
         return 1;
     }
 
+    std::cout << "Hello, world." << std::endl;
+    ccptr file_name = argv[1];
+    ccptr executable_directory = system_get_executable_directory();
+    ccptr current_working_directory = system_get_current_working_directory();
 
+    std::cout << "Executable directory: " << executable_directory << std::endl;
+    std::cout << "Current working directory: " << current_working_directory << std::endl;
 
     return 0;
 }

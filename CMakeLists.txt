@@ -16,6 +16,14 @@ IF(UNIX)
     )
 ENDIF(UNIX)
 
+# Windows specific platform files.
+IF(WIN32)
+    SET(PLATFORM_FILES
+        "source/platform/win32/system.cpp"
+        "source/platform/win32/filesystem.cpp"
+    )
+ENDIF(WIN32)
+
 ADD_EXECUTABLE(ncc
     "source/main.cpp"
 
