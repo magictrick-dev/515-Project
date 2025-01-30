@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cassert>
 #include <string>
+#include <vector>
 
 typedef uint8_t         u8;
 typedef uint16_t        u16;
@@ -26,6 +27,7 @@ typedef char*           cptr;
 #define ENSURE_PTR(ptr)         assert(ptr != NULL)
 #define ENSURE_SIZE(size)       assert(size > 0)
 
-using std::string; // We may want to write our own to track memory allocations.
+using std::string;
+using std::vector;
 
 #endif

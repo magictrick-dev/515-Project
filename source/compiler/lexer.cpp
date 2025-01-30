@@ -17,15 +17,22 @@ template <typename ...Args> inline bool scanner_match(scanner *lexer, Args... ar
 // of the lexer advances the token buffer by one. This allows for a lookahead of 2 tokens,
 // which may prove useful in parsing.
 //
-// lexer_advance(scanner *lexer) - Advances the lexer by one character.
-// lexer_consume(scanner *lexer, char *c) - Consumes the current character and returns it.
-// lexer_examine(scanner *lexer, char *c) - Examines the current character without consuming it.
-// lexer_peek(scanner *lexer, char *c) - Peeks at the next character without consuming it.
-// lexer_peek_ahead(scanner *lexer, u64 step, char *c) - Peeks at the character at the given step without consuming it.
-// scanner_match(scanner *lexer, Args... args) - Matches the current character against the given arguments.
+// lexer_advance(scanner *lexer) 
+//      - Advances the lexer by one character.
+// lexer_consume(scanner *lexer, char *c) 
+//      - Consumes the current character and returns it.
+// lexer_examine(scanner *lexer, char *c) 
+//      - Examines the current character without consuming it.
+// lexer_peek(scanner *lexer, char *c) 
+//      - Peeks at the next character without consuming it.
+// lexer_peek_ahead(scanner *lexer, u64 step, char *c) 
+//      - Peeks at the character at the given step without consuming it.
+// scanner_match(scanner *lexer, Args... args) 
+//      - Matches the current character against the given arguments.
 //
-// This implementation is slightly different from the unget() system as recommended by the
-// professor, but should functionally produce the same results.
+// This implementation is slightly different from the unget() system, but functionally
+// works the same by allowing the lexer to peek forward rather than unwinding what 
+// occured before.
 //
 
 bool    
@@ -135,5 +142,53 @@ lexer_is_eof(scanner *lexer)
 //
 // Any functions needed by the API not provided for the frontend are written here.
 //
+
+static inline bool 
+lexer_advance(scanner *lexer)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
+
+static inline bool 
+lexer_consume(scanner *lexer, char *c)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
+
+static inline bool 
+lexer_examine(scanner *lexer, char *c)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
+
+static inline bool 
+lexer_peek(scanner *lexer, char *c)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
+
+static inline bool 
+lexer_peek_ahead(scanner *lexer, u64 step, char *c)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
+
+template <typename ...Args> inline bool 
+scanner_match(scanner *lexer, Args... args)
+{
+
+    NOIMPL("Haven't done it yet.");
+    return false;
+}
 
 
