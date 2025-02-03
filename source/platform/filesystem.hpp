@@ -1,7 +1,7 @@
 #ifndef SOURCE_PLATFORM_FILESYSTEM_HPP
 #define SOURCE_PLATFORM_FILESYSTEM_HPP
 #include <definitions.hpp>
-#include <buffer.hpp>
+#include <utilities/buffer.hpp>
 
 bool filesystem_path_is_valid(ccptr path);
 bool filesystem_path_exists(ccptr path);

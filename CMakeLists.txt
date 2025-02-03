@@ -26,8 +26,12 @@ ENDIF(WIN32)
 
 ADD_EXECUTABLE(ncc
     "source/main.cpp"
-    "source/buffer.hpp"
     "source/definitions.hpp"
+
+    "source/utilities/buffer.hpp"
+    "source/utilities/buffer.cpp"
+    "source/utilities/filepath.hpp"
+    "source/utilities/filepath.cpp"
 
     "source/compiler/errors.hpp"
     "source/compiler/lexer.hpp"

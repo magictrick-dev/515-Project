@@ -1,7 +1,7 @@
 #ifndef SOURCE_PLATFORM_SYSTEM_HPP
 #define SOURCE_PLATFORM_SYSTEM_HPP
 #include <definitions.hpp>
-#include <buffer.hpp>
+#include <utilities/buffer.hpp>
 
 memory_buffer   system_virtual_allocate(vptr offset, u64 size);
 void            system_virtual_free(vptr ptr, u64 size);

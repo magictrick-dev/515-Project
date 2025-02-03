@@ -17,6 +17,8 @@ typedef int64_t         i64;
 typedef void*           vptr;
 typedef const char*     ccptr;
 typedef char*           cptr;
+typedef float           r32;
+typedef double          r64;
 
 #define MEMORY_ALLOCATE(u64)    malloc(u64)
 #define MEMORY_RELEASE(ptr)     free(ptr)
