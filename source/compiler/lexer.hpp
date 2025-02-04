@@ -1,3 +1,9 @@
+// --- Lexer / Scanner ---------------------------------------------------------
+//
+// The lexer is a scanner designer with rolling buffer to get tokens. Its mainly
+// for grabbing tokens on-demand.
+//
+// -----------------------------------------------------------------------------
 #ifndef SOURCE_COMPILER_LEXER_HPP
 #define SOURCE_COMPILER_LEXER_HPP
 #include <definitions.hpp>
@@ -6,6 +12,8 @@
 
 enum class token_type
 {
+    TOKEN_NULL,
+    TOKEN_ERROR,
     TOKEN_EOF,
     TOKEN_PLUS,
     TOKEN_MINUS,
@@ -53,6 +61,7 @@ struct scanner
 
     memory_buffer source_buffer;
 
+    string  source_file_path;
     cptr    source_string;
     u64     source_size;
     u64     source_offset;
@@ -69,19 +78,17 @@ struct scanner
 };
 
 bool    lexer_initialize(scanner *lexer, ccptr file_path);
-bool    lexer_release(scanner *lexer); 
 string  lexer_get_last_error(scanner *lexer);
 
 token   lexer_get_previous_token(scanner *lexer);
 token   lexer_get_current_token(scanner *lexer);
 token   lexer_get_next_token(scanner *lexer);
 
-bool    lexer_shift(scanner *lexer);
+void    lexer_shift(scanner *lexer);
 
 bool    lexer_previous_token_is(scanner *lexer, token_type type);
 bool    lexer_current_token_is(scanner *lexer, token_type type);
 bool    lexer_next_token_is(scanner *lexer, token_type type);
-
 bool    lexer_is_eof(scanner *lexer);
 
 string  lexer_token_type_to_string(token_type type);
