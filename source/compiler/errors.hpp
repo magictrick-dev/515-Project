@@ -1,6 +1,7 @@
 #ifndef SOURCE_COMPILER_ERRORS_HPP
 #define SOURCE_COMPILER_ERRORS_HPP
 #include <definitions.hpp>
+#include <utilities/string.hpp>
 
 enum class ErrorType : i32
 {

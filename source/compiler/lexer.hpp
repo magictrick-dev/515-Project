@@ -9,6 +9,7 @@
 #include <definitions.hpp>
 #include <compiler/errors.hpp>
 #include <utilities/buffer.hpp>
+#include <utilities/string.hpp>
 
 enum class token_type
 {

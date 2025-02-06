@@ -1,6 +1,7 @@
 #ifndef SOURCE_UTILITIES_FILEPATH_HPP
 #define SOURCE_UTILITIES_FILEPATH_HPP
 #include <definitions.hpp>
+#include <utilities/string.hpp>
 
 class filepath
 {
