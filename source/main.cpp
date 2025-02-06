@@ -37,11 +37,21 @@ int
 main(int argc, char ** argv)
 {
 
+    // --- CLI Validation ------------------------------------------------------
+    //
+    // Checks the CLI arguments and configures the program accordingly.
+    //
+
     if (argc < 2)
     {
         std::cout << "Usage: " << argv[0] << " <file_name>" << std::endl;
         return 1;
     }
+
+    // --- Compiler Setup ------------------------------------------------------
+    //
+    // Self-explanatory.
+    //
 
     // Get the user source file.
     filepath source_file = system_get_current_working_directory();
@@ -64,10 +74,19 @@ main(int argc, char ** argv)
         return 1;
     }
 
-    // Print the contents.
-    std::cout << "File size: " << source_size << std::endl;
-    std::cout << (char*)source_file_buffer.data;
+    // --- Memory Check --------------------------------------------------------
+    //
+    // Checks the memory useage of the entire program.
+    //
 
+#if 0
+    memory_stats stats = {0};
+    memory_statistics(&stats);
+    std::cout << "Total: " << stats.total_allocated << std::endl;
+    std::cout << "Released: " << stats.total_released << std::endl;
+    std::cout << "Peak: " << stats.peak_allocated << std::endl;
+    std::cout << "Current: " << stats.current_allocated << std::endl;
+#endif
 
     return 0;
 }

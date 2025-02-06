@@ -5,6 +5,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <utilities/allocators.hpp>
 
 typedef uint8_t         u8;
 typedef uint16_t        u16;
