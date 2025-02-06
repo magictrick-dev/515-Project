@@ -26,8 +26,19 @@ class string
         char&       operator[](u64 index);
         char        operator[](u64 index) const;
 
+        bool        operator==(const string &str) const;
+        bool        operator==(ccptr str) const;
+
+        bool        operator!=(const string &str) const;
+        bool        operator!=(ccptr str) const;
+
+        string&     operator+=(ccptr str);
+        string&     operator+=(const string &str);
+
         cptr        data();
         ccptr       c_str() const;
+
+        bool        empty() const;
 
     protected:
         void        resize(u64 size);

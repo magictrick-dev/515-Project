@@ -213,7 +213,8 @@ canonicalize() const
 
     // Ew, but I am way too lazy to write this function.
     try {
-        return std::filesystem::canonical(this->file_path).string();
+        return std::filesystem::canonical(this->file_path.c_str())
+            .string().c_str();
     } catch (const std::filesystem::filesystem_error& e) {
         return this->file_path;
     }

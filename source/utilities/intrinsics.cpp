@@ -47,3 +47,21 @@ intrinsic_string_length(ccptr string)
 
 }
 
+bool
+intrinsic_string_compare(cptr left, ccptr right)
+{
+
+    u64 idx = 0;
+    while (left[idx] != '\0' && right[idx] != '\0')
+    {
+
+        if (left[idx] != right[idx])
+            return false;
+
+        idx++;
+
+    }
+
+    return left[idx] == right[idx];
+
+}

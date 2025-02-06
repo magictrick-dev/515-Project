@@ -103,6 +103,64 @@ operator[](u64 index) const
 
 }
 
+bool string::
+operator==(ccptr str) const
+{
+
+    return intrinsic_string_compare(this->buffer, str);
+
+}
+
+bool string::
+operator==(const string &str) const
+{
+
+    return intrinsic_string_compare(this->buffer, str.buffer);
+
+}
+
+bool string::
+operator!=(ccptr str) const
+{
+
+    return !intrinsic_string_compare(this->buffer, str);
+
+}
+
+bool string::
+operator!=(const string &str) const
+{
+
+    return !intrinsic_string_compare(this->buffer, str.buffer);
+
+}
+
+string& string::
+operator+=(ccptr str)
+{
+
+    u64 length = intrinsic_string_length(str) + 1;
+    u64 new_size = this->size + length;
+    this->resize(new_size);
+    intrinsic_string_copy_simple(this->buffer + this->size, str, length);
+
+    return *this;
+
+}
+
+string& string::
+operator+=(const string &str)
+{
+
+    u64 length = str.size;
+    u64 new_size = this->size + length;
+    this->resize(new_size);
+    intrinsic_string_copy_simple(this->buffer + this->size, str.buffer, length);
+
+    return *this;
+
+}
+
 cptr string::
 data()
 {
@@ -143,6 +201,21 @@ clear()
     memory_release(this->buffer);
     this->buffer = nullptr;
     this->size = 0;
+
+}
+
+bool string::
+empty() const
+{
+
+    if (this->buffer == nullptr)
+        return true;
+    else if (this->size == 0)
+        return true;
+    else if (this->buffer[0] == '\0')
+        return true;
+
+    return false;
 
 }
 
