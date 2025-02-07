@@ -34,8 +34,8 @@ ADD_EXECUTABLE(ncc
 
     "source/utilities/buffer.hpp"
     "source/utilities/buffer.cpp"
-    "source/utilities/filepath.hpp"
-    "source/utilities/filepath.cpp"
+    #source/utilities/filepath.hpp"
+    #"source/utilities/filepath.cpp"
     "source/utilities/allocators.hpp"
     "source/utilities/allocators.cpp"
     "source/utilities/string.hpp"

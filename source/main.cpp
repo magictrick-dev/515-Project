@@ -31,7 +31,6 @@
 #include <platform/filesystem.hpp>
 #include <compiler/lexer/scanner.hpp>
 #include <utilities/buffer.hpp>
-#include <utilities/filepath.hpp>
 #include <utilities/allocators.hpp>
 
 int
@@ -56,6 +55,7 @@ main(int argc, char ** argv)
 
     {
 
+#if 0
         // Get the user source file.
         filepath source_file = system_get_current_working_directory();
         source_file += "/" + string(argv[1]);
@@ -70,17 +70,27 @@ main(int argc, char ** argv)
 
         // Read the entire file into memory.
         u64 source_size = canonical_source_file.get_file_size();
-        memory_buffer source_file_buffer = system_virtual_allocate(nullptr, source_size);
-        if (!filesystem_read_entire_file(canonical_source_file.c_str(), &source_file_buffer))
+#endif
+        u64 source_size;
+        filesystem_get_file_size(argv[1], &source_size);
+        if (source_size == 0)
         {
-            std::cout << "Failed to read file: " << canonical_source_file.str() << std::endl;
+            std::cout << "Failed to get file size: " << argv[1] << std::endl;
+            std::cout << "File may not exist." << std::endl;
+            return 1;
+        }
+
+        memory_buffer source_file_buffer = system_virtual_allocate(nullptr, source_size);
+        if (!filesystem_read_entire_file(argv[1], &source_file_buffer))
+        {
+            std::cout << "Failed to read file: " << argv[1] << std::endl;
             return 1;
         }
 
         // Initialize the scanner.
         scanner lexer = {0};
         lexer.source_buffer = source_file_buffer;
-        scanner_initialize(&lexer, canonical_source_file.c_str(), source_size);
+        scanner_initialize(&lexer, argv[1], source_size);
 
         // Tokenize the source file.
         while (!scanner_is_eof(&lexer))
