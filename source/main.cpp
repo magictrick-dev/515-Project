@@ -29,9 +29,10 @@
 #include <definitions.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
-#include <compiler/lexer.hpp>
+#include <compiler/lexer/scanner.hpp>
 #include <utilities/buffer.hpp>
 #include <utilities/filepath.hpp>
+#include <utilities/allocators.hpp>
 
 int
 main(int argc, char ** argv)
@@ -50,28 +51,46 @@ main(int argc, char ** argv)
 
     // --- Compiler Setup ------------------------------------------------------
     //
-    // Self-explanatory.
+    // Initializes the compiler and prepares the source file for processing.
     //
 
-    // Get the user source file.
-    filepath source_file = system_get_current_working_directory();
-    source_file += "/" + string(argv[1]);
-
-    // Get the canonical path.
-    filepath canonical_source_file = source_file.canonicalize();
-    if (!canonical_source_file.is_file())
     {
-        std::cout << "Invalid file path: " << canonical_source_file.str() << std::endl;
-        return 1;
-    }
 
-    // Read the entire file into memory.
-    u64 source_size = canonical_source_file.get_file_size();
-    memory_buffer source_file_buffer = system_virtual_allocate(nullptr, source_size);
-    if (!filesystem_read_entire_file(canonical_source_file.c_str(), &source_file_buffer))
-    {
-        std::cout << "Failed to read file: " << canonical_source_file.str() << std::endl;
-        return 1;
+        // Get the user source file.
+        filepath source_file = system_get_current_working_directory();
+        source_file += "/" + string(argv[1]);
+
+        // Get the canonical path.
+        filepath canonical_source_file = source_file.canonicalize();
+        if (!canonical_source_file.is_file())
+        {
+            std::cout << "Invalid file path: " << canonical_source_file.str() << std::endl;
+            return 1;
+        }
+
+        // Read the entire file into memory.
+        u64 source_size = canonical_source_file.get_file_size();
+        memory_buffer source_file_buffer = system_virtual_allocate(nullptr, source_size);
+        if (!filesystem_read_entire_file(canonical_source_file.c_str(), &source_file_buffer))
+        {
+            std::cout << "Failed to read file: " << canonical_source_file.str() << std::endl;
+            return 1;
+        }
+
+        // Initialize the scanner.
+        scanner lexer = {0};
+        lexer.source_buffer = source_file_buffer;
+        scanner_initialize(&lexer, canonical_source_file.c_str(), source_size);
+
+        // Tokenize the source file.
+        while (!scanner_is_eof(&lexer))
+        {
+            std::cout << lexer.current_token->format() << std::endl;
+            scanner_shift(&lexer);
+        }
+
+        std::cout << lexer.current_token->format() << std::endl;
+
     }
 
     // --- Memory Check --------------------------------------------------------
@@ -80,12 +99,14 @@ main(int argc, char ** argv)
     //
 
 #if 0
+
     memory_stats stats = {0};
     memory_statistics(&stats);
     std::cout << "Total: " << stats.total_allocated << std::endl;
     std::cout << "Released: " << stats.total_released << std::endl;
     std::cout << "Peak: " << stats.peak_allocated << std::endl;
     std::cout << "Current: " << stats.current_allocated << std::endl;
+
 #endif
 
     return 0;

@@ -1,3 +1,4 @@
+#include "utilities/intrinsics.hpp"
 #include <utilities/buffer.hpp>
 
 void    
@@ -251,7 +252,7 @@ memory_buffer_read_bytes(memory_buffer* buffer, vptr value, u64 size)
 
     if (buffer->position + size <= buffer->size)
     {
-        memcpy(value, (u8*)buffer->data + buffer->position, size);
+        intrinsic_memory_copy_simple(value, (u8*)buffer->data + buffer->position, size);
         buffer->position += size;
         return true;
     }
@@ -432,7 +433,7 @@ memory_buffer_write_bytes(memory_buffer* buffer, vptr value, u64 size)
 
     if (buffer->position + size <= buffer->size)
     {
-        memcpy((u8*)buffer->data + buffer->position, value, size);
+        intrinsic_memory_copy_simple((u8*)buffer->data + buffer->position, value, size);
         buffer->position += size;
         return true;
     }

@@ -34,10 +34,15 @@ ADD_EXECUTABLE(ncc
     "source/utilities/filepath.cpp"
     "source/utilities/allocators.hpp"
     "source/utilities/allocators.cpp"
+    "source/utilities/string.hpp"
+    "source/utilities/string.cpp"
+    "source/utilities/intrinsics.hpp"
+    "source/utilities/intrinsics.cpp"
 
-    "source/compiler/errors.hpp"
-    "source/compiler/lexer.hpp"
-    "source/compiler/lexer.cpp"
+    "source/compiler/lexer/token.hpp"
+    "source/compiler/lexer/token.cpp"
+    "source/compiler/lexer/scanner.hpp"
+    "source/compiler/lexer/scanner.cpp"
 
     "source/platform/filesystem.hpp"
     "source/platform/system.hpp"

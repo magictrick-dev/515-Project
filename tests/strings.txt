@@ -1,0 +1,2 @@
+# String example.
+"Spanish: Puedo comer vidrio, no me hace da\u0000f1o."

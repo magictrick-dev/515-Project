@@ -152,11 +152,12 @@ get_directory() const
 {
 
     string directory;
-    string::size_type pos = file_path.find_last_of("/\\");
-    if (pos != string::npos)
+    u64 position = 0;
+    if (file_path.find_last_of("/\\", position))
     {
-        directory = file_path.substr(0, pos);
+        directory = file_path.substr(0, position);
     }
+    
     return directory;
 
 }
@@ -166,11 +167,12 @@ get_filename() const
 {
 
     string filename;
-    string::size_type pos = file_path.find_last_of("/\\");
-    if (pos != string::npos)
+    u64 position = 0;
+    if (file_path.find_last_of("/\\", position))
     {
-        filename = file_path.substr(pos + 1);
+        filename = file_path.substr(position + 1);
     }
+
     return filename;
 
 }
@@ -180,11 +182,12 @@ get_extension() const
 {
 
     string extension;
-    string::size_type pos = file_path.find_last_of(".");
-    if (pos != string::npos)
+    u64 position = 0;
+    if (file_path.find_last_of(".", position))
     {
-        extension = file_path.substr(pos + 1);
+        extension = file_path.substr(position + 1);
     }
+
     return extension;
 
 }

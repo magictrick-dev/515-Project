@@ -5,9 +5,8 @@
 
 // --- String ------------------------------------------------------------------
 //
-// Replaces the standard library implementation with one that interfaces directly
-// with the custom allocator. Never trust the standard library. Bad things happen
-// when you do.
+// It's no where near as fancy as the STL string class, but what it does do, it
+// does poorly.
 //
 
 class string
@@ -34,21 +33,39 @@ class string
 
         string&     operator+=(ccptr str);
         string&     operator+=(const string &str);
+        string&     operator+=(char c);
+        string&     operator+=(int i);
+        string&     operator+=(float i);
+        string&     operator+=(double i);
 
         cptr        data();
         ccptr       c_str() const;
 
+        u64         length() const;
+
         bool        empty() const;
+
+        bool        find_last_of(ccptr characters, u64 &index) const;
+
+        string      substr(u64 end) const;
+        string      substr(u64 start, u64 end) const;
 
     protected:
         void        resize(u64 size);
         void        clear();
 
     protected:
-        cptr    buffer;
-        u64     size;
+        cptr    buffer  = nullptr;
+        u64     size    = 0;
+
+    friend std::ostream& operator<<(std::ostream &stream, const string &str);
+    friend string operator+(ccptr lhs, const string &rhs);
+    friend string operator+(const string &lhs, ccptr rhs);
+
 };
 
 std::ostream& operator<<(std::ostream &stream, const string &str);
+string operator+(ccptr lhs, const string &rhs);
+string operator+(const string &lhs, ccptr rhs);
 
 #endif
