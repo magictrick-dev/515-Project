@@ -10,6 +10,7 @@ SET(PLATFORM_FILES "")
 
 # Unix specific platform files.
 IF(UNIX)
+    MESSAGE("Using UNIX")
     SET(PLATFORM_FILES
         "source/platform/unix/system.cpp"
         "source/platform/unix/filesystem.cpp"
@@ -18,6 +19,7 @@ ENDIF(UNIX)
 
 # Windows specific platform files.
 IF(WIN32)
+    MESSAGE("Using WIN32")
     SET(PLATFORM_FILES
         "source/platform/win32/system.cpp"
         "source/platform/win32/filesystem.cpp"
@@ -25,6 +27,8 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(ncc
+    ${PLATFORM_FILES}
+    
     "source/main.cpp"
     "source/definitions.hpp"
 
@@ -47,7 +51,6 @@ ADD_EXECUTABLE(ncc
     "source/platform/filesystem.hpp"
     "source/platform/system.hpp"
 
-    ${PLATFORM_FILES}
 )
 
 TARGET_INCLUDE_DIRECTORIES(ncc PUBLIC "source")

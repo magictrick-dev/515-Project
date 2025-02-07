@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <platform/system.hpp>
+#include <utilities/buffer.hpp>
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -10,7 +11,7 @@ system_virtual_allocate(vptr offset, u64 size)
     // In case the user does something silly.
     if (size == 0)
     {
-        buffer result = {0};
+        memory_buffer result = {0};
         return result;
     }
 
