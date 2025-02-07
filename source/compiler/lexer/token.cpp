@@ -191,7 +191,7 @@ parse_reference_as_string() const
                         }
 
                         // Convert the hex string to a number.
-                        i32 codepoint = 0;
+                        u32 codepoint = 0;
                         sscanf(unicode, "%x", &codepoint);
 
                         // Convert the codepoint to a utf8 character.

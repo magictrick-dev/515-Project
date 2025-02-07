@@ -68,33 +68,33 @@ intrinsic_string_compare(cptr left, ccptr right)
 }
 
 void
-intrinsic_codepoint_to_utf8(i32 codepoint, cptr output)
+intrinsic_codepoint_to_utf8(u32 codepoint, cptr output)
 {
 
-    if (codepoint <= 0b01111111)
+    if (codepoint <= 0x7F)
     {
         output[0] = codepoint;
         output[1] = '\0';
     } 
-    else if (codepoint <= 0b01111111111)
+    else if (codepoint <= 0x7FF)
     {
-        output[0] = 0b11000000 | (codepoint >> 6);
-        output[1] = 0b10000000 | (codepoint & 0b00111111);
+        output[0] = 0b11000000 | ((codepoint >> 6 ) & 0b00011111);
+        output[1] = 0b10000000 | ((codepoint >> 0 ) & 0b00111111);
         output[2] = '\0';
     } 
-    else if (codepoint <= 0b1111111111111111) 
+    else if (codepoint <= 0xFFFF) 
     {
-        output[0] = 0b11100000 | (codepoint >> 12);
-        output[1] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-        output[2] = 0b10000000 | (codepoint & 0b00111111);
+        output[0] = 0b11100000 | ((codepoint >> 12) & 0b00001111);
+        output[1] = 0b10000000 | ((codepoint >> 6 ) & 0b00111111);
+        output[2] = 0b10000000 | ((codepoint >> 0 ) & 0b00111111);
         output[3] = '\0';
     } 
-    else if (codepoint <= 0b100001111111111111111) 
+    else if (codepoint <= 0x10FFFF) 
     {
-        output[0] = 0b11110000 | (codepoint >> 18);
+        output[0] = 0b11110000 | ((codepoint >> 18) & 0b00000111);
         output[1] = 0b10000000 | ((codepoint >> 12) & 0b00111111);
-        output[2] = 0b10000000 | ((codepoint >> 6) & 0b00111111);
-        output[3] = 0b10000000 | (codepoint & 0b00111111);
+        output[2] = 0b10000000 | ((codepoint >> 6 ) & 0b00111111);
+        output[3] = 0b10000000 | ((codepoint >> 0 ) & 0b00111111);
         output[4] = '\0';
     } 
     else 
