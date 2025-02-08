@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cassert>
-#include <string>
 
 typedef uint8_t         u8;
 typedef uint16_t        u16;
@@ -16,16 +15,13 @@ typedef int64_t         i64;
 typedef void*           vptr;
 typedef const char*     ccptr;
 typedef char*           cptr;
-
-#define MEMORY_ALLOCATE(u64)    malloc(u64)
-#define MEMORY_RELEASE(ptr)     free(ptr)
+typedef float           r32;
+typedef double          r64;
 
 #define NOREACH(msg)            assert(!msg)
 #define NOIMPL(msg)             assert(!msg)
 #define ENSURE(expr)            assert(expr)
 #define ENSURE_PTR(ptr)         assert(ptr != NULL)
 #define ENSURE_SIZE(size)       assert(size > 0)
-
-using std::string; // We may want to write our own to track memory allocations.
 
 #endif

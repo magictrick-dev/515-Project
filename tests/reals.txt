@@ -1,0 +1,16 @@
+# Valid reals.
+1.
+123.456
+2e9
+3.0e+856
+4.5E-17
+.7e5
+
+# Integer.
+6
+010
+
+# Invalid reals.
+3.E07
+3.5e
+2.9e-

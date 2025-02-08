@@ -1,7 +1,7 @@
 #include <platform/system.hpp>
 #include <windows.h>
 
-buffer 
+memory_buffer 
 system_virtual_allocate(vptr offset, u64 size)
 {
     
@@ -9,12 +9,12 @@ system_virtual_allocate(vptr offset, u64 size)
     u64 page_size = system_virtual_page_size();
     u64 required_size = size + (page_size - (size % page_size));
     
-    LPVOID result = VirtualAlloc(offset, required_size, MEM_COMMIT|MEM_RESERVER, PAGE_READWRITE);
+    LPVOID result = VirtualAlloc(offset, required_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
     ENSURE(result != nullptr);
 
-    buffer buff = {0};
-    buff.result = result;
-    buff.size = required_size;
+    memory_buffer buff = {0};
+    buff.data   = result;
+    buff.size   = required_size;
 
     return buff;
 
@@ -61,9 +61,18 @@ system_get_executable_directory()
     static bool initialized = false;
     if (!initialized)
     {
+
         GetModuleFileNameA(nullptr, buffer, MAX_PATH);
-        PathRemoveFileSpecA(buffer);
+
+        // Remove the executable name.
+        char* last_slash = strrchr(buffer, '\\');
+        if (last_slash)
+        {
+            *last_slash = '\0';
+        }
+
         initialized = true;
+
     }
 
     return buffer;
