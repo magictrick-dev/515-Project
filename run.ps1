@@ -1,1 +1,1 @@
-build/Debug/ncc.exe tests/strings.txt
+build/ncc.exe tests/test151.txt

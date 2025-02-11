@@ -1,5 +1,4 @@
 #include <utilities/intrinsics.hpp>
-#include <iostream>
 
 void 
 intrinsic_memory_copy_simple(void* destination, void* source, uint64_t size)

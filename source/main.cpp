@@ -33,9 +33,18 @@
 #include <utilities/buffer.hpp>
 #include <utilities/allocators.hpp>
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
+
 int
 main(int argc, char ** argv)
 {
+
+#   if defined(_WIN32) || defined(_WIN64)
+        // PAIN.
+        SetConsoleOutputCP(CP_UTF8);
+#   endif
 
     // --- CLI Validation ------------------------------------------------------
     //
