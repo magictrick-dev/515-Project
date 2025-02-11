@@ -27,6 +27,7 @@
 // -----------------------------------------------------------------------------
 #include <iostream>
 #include <definitions.hpp>
+#include <runtime.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
 #include <compiler/lexer/scanner.hpp>
