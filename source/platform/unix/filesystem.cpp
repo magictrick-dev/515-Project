@@ -4,7 +4,7 @@
 #include <fcntl.h>
 
 bool
-fileystem_path_is_valid(ccptr path)
+filesystem_path_is_valid(ccptr path)
 {
 
     // Check if the path is valid.
