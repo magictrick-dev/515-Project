@@ -12,6 +12,7 @@ SET(PLATFORM_FILES "")
 IF(UNIX)
     MESSAGE("Using UNIX")
     SET(PLATFORM_FILES
+        "source/platform/unix/entrypoint.cpp"
         "source/platform/unix/system.cpp"
         "source/platform/unix/filesystem.cpp"
     )
@@ -21,6 +22,7 @@ ENDIF(UNIX)
 IF(WIN32)
     MESSAGE("Using WIN32")
     SET(PLATFORM_FILES
+        "source/platform/win32/entrypoint.cpp"
         "source/platform/win32/system.cpp"
         "source/platform/win32/filesystem.cpp"
     )
@@ -29,12 +31,13 @@ ENDIF(WIN32)
 ADD_EXECUTABLE(ncc
     ${PLATFORM_FILES}
     
-    "source/main.cpp"
+    "source/runtime.hpp"
+    "source/runtime.cpp"
     "source/definitions.hpp"
 
     "source/utilities/buffer.hpp"
     "source/utilities/buffer.cpp"
-    #source/utilities/filepath.hpp"
+    #"source/utilities/filepath.hpp"
     #"source/utilities/filepath.cpp"
     "source/utilities/allocators.hpp"
     "source/utilities/allocators.cpp"
