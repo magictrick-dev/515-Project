@@ -1,7 +1,7 @@
+#include <filesystem>
 #include <utilities/filepath.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
-#include <filesystem>
 
 filepath::
 filepath()
