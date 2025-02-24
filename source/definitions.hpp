@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cassert>
+#include <memory>
 
 typedef uint8_t         u8;
 typedef uint16_t        u16;
@@ -23,5 +24,7 @@ typedef double          r64;
 #define ENSURE(expr)            assert(expr)
 #define ENSURE_PTR(ptr)         assert(ptr != NULL)
 #define ENSURE_SIZE(size)       assert(size > 0)
+
+using std::shared_ptr;
 
 #endif

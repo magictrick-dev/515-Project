@@ -3,7 +3,7 @@
 #include <definitions.hpp>
 #include <utilities/string.hpp>
 
-enum class tokentype
+enum class TokenType
 {
     TOKEN_NULL,
     TOKEN_ERROR_UNKNOWN,
@@ -44,17 +44,17 @@ enum class tokentype
     TOKEN_REAL
 };
 
-class token
+class Token
 {
 
     public:
-                    token();
-                    token(string reference, string source, tokentype type, i32 line, i32 column);
-        virtual    ~token();
+                    Token();
+                    Token(string reference, string source, TokenType type, i32 line, i32 column);
+        virtual    ~Token();
 
         string      get_reference() const;
         string      get_source() const;
-        tokentype   get_type() const;
+        TokenType   get_type() const;
         string      get_type_string() const;
         i32         get_line() const;
         i32         get_column() const;
@@ -66,7 +66,7 @@ class token
     protected:
         string      reference;
         string      source;
-        tokentype   type;
+        TokenType   type;
         i32         line;
         i32         column;
 

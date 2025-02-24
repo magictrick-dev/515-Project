@@ -30,7 +30,7 @@
 #include <runtime.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
-#include <compiler/lexer/scanner.hpp>
+#include <compiler/lexer/tokenizer.hpp>
 #include <utilities/buffer.hpp>
 #include <utilities/allocators.hpp>
 #include <utilities/filepath.hpp>
@@ -70,6 +70,7 @@ runtime(int argc, char ** argv)
             return 1;
         }
 
+#if 0
         // Read the entire file into memory.
         u64 source_size = canonical_source_file.get_file_size();
 
@@ -101,6 +102,17 @@ runtime(int argc, char ** argv)
         }
 
         std::cout << lexer.current_token->format() << std::endl;
+#endif
+
+        Tokenizer tokenizer;
+        tokenizer.initialize(canonical_source_file.c_str());
+
+        while (true)
+        {
+            if (tokenizer.current_token_is(TokenType::TOKEN_EOF)) break;
+            std::cout << tokenizer.get_current_token().format() << std::endl;
+            tokenizer.shift();
+        }
 
     }
 

@@ -13,8 +13,6 @@ class Compiler
         virtual    ~Compiler();
 
         bool        parse(string source);
-        bool        validate();
-        bool        generate();
 
     protected:
         Environment environment;

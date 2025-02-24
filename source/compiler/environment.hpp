@@ -1,6 +1,7 @@
 #ifndef SOURCE_COMPILER_ENVIRONMENT_HPP
 #define SOURCE_COMPILER_ENVIRONMENT_HPP
 #include <definitions.hpp>
+#include <unordered_map>
 
 class Environment
 {
@@ -13,6 +14,7 @@ class Environment
         void        pop_table();
 
     protected:
+        
         
 };
 

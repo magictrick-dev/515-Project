@@ -1,1 +1,1 @@
-devenv build\ncc.sln
+devenv build\Debug\ncc.sln

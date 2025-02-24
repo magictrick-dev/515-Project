@@ -28,6 +28,7 @@ IF(WIN32)
     )
 ENDIF(WIN32)
 
+# The executable.
 ADD_EXECUTABLE(ncc
     ${PLATFORM_FILES}
     
@@ -46,14 +47,21 @@ ADD_EXECUTABLE(ncc
     "source/utilities/intrinsics.hpp"
     "source/utilities/intrinsics.cpp"
 
+    "source/compiler/compiler.hpp"
+    "source/compiler/compiler.cpp"
+    "source/compiler/graph.hpp"
+    "source/compiler/graph.cpp"
+    "source/compiler/environment.hpp"
+    "source/compiler/environment.cpp"
     "source/compiler/lexer/token.hpp"
     "source/compiler/lexer/token.cpp"
-    "source/compiler/lexer/scanner.hpp"
-    "source/compiler/lexer/scanner.cpp"
+    "source/compiler/lexer/tokenizer.hpp"
+    "source/compiler/lexer/tokenizer.cpp"
 
     "source/platform/filesystem.hpp"
     "source/platform/system.hpp"
 
 )
 
+# Include directories.
 TARGET_INCLUDE_DIRECTORIES(ncc PUBLIC "source")

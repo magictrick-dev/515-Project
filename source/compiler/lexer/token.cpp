@@ -1,18 +1,18 @@
 #include <compiler/lexer/token.hpp>
 #include <utilities/intrinsics.hpp>
 
-token::
-token()
+Token::
+Token()
 {
     this->reference = "";
     this->source    = "";
-    this->type      = tokentype::TOKEN_NULL;
+    this->type      = TokenType::TOKEN_NULL;
     this->line      = 0;
     this->column    = 0;
 }
 
-token::
-token(string reference, string source, tokentype type, i32 line, i32 column)
+Token::
+Token(string reference, string source, TokenType type, i32 line, i32 column)
 {
     this->reference = reference;
     this->source    = source;
@@ -21,79 +21,79 @@ token(string reference, string source, tokentype type, i32 line, i32 column)
     this->column    = column;
 }
 
-token::
-~token()
+Token::
+~Token()
 {
     this->reference = "";
     this->source    = "";
-    this->type      = tokentype::TOKEN_NULL;
+    this->type      = TokenType::TOKEN_NULL;
     this->line      = 0;
     this->column    = 0;
 }
 
-string token::
+string Token::
 get_reference() const
 {
     return this->reference;
 }
 
-string token::
+string Token::
 get_source() const
 {
     return this->source;
 }
 
-tokentype token::
+TokenType Token::
 get_type() const
 {
     return this->type;
 }
 
-string token::
+string Token::
 get_type_string() const
 {
 
     switch (this->type)
     {
 
-        case tokentype::TOKEN_NULL:                     return "TOKEN_NULL";
-        case tokentype::TOKEN_ERROR_UNKNOWN:            return "TOKEN_ERROR_UNKNOWN";
-        case tokentype::TOKEN_ERROR_INVALID_INTEGER:    return "TOKEN_ERROR_INVALID_INTEGER";
-        case tokentype::TOKEN_ERROR_INVALID_REAL:       return "TOKEN_ERROR_INVALID_REAL";
-        case tokentype::TOKEN_ERROR_UNEXPECTED_EOF:     return "TOKEN_ERROR_UNEXPECTED_EOF";
-        case tokentype::TOKEN_ERROR_INVALID_ESCAPE:     return "TOKEN_ERROR_INVALID_ESCAPE";
+        case TokenType::TOKEN_NULL:                     return "TOKEN_NULL";
+        case TokenType::TOKEN_ERROR_UNKNOWN:            return "TOKEN_ERROR_UNKNOWN";
+        case TokenType::TOKEN_ERROR_INVALID_INTEGER:    return "TOKEN_ERROR_INVALID_INTEGER";
+        case TokenType::TOKEN_ERROR_INVALID_REAL:       return "TOKEN_ERROR_INVALID_REAL";
+        case TokenType::TOKEN_ERROR_UNEXPECTED_EOF:     return "TOKEN_ERROR_UNEXPECTED_EOF";
+        case TokenType::TOKEN_ERROR_INVALID_ESCAPE:     return "TOKEN_ERROR_INVALID_ESCAPE";
 
-        case tokentype::TOKEN_EOF:                 return "TOKEN_EOF";
-        case tokentype::TOKEN_PLUS:                return "TOKEN_PLUS";
-        case tokentype::TOKEN_MINUS:               return "TOKEN_MINUS";
-        case tokentype::TOKEN_MULTIPLY:            return "TOKEN_MULTIPLY";
-        case tokentype::TOKEN_DIVIDE:              return "TOKEN_DIVIDE";
-        case tokentype::TOKEN_IDENTIFIER:          return "TOKEN_IDENTIFIER";
-        case tokentype::TOKEN_EXPONENT:            return "TOKEN_EXPONENT";
-        case tokentype::TOKEN_LESS:                return "TOKEN_LESS";
-        case tokentype::TOKEN_LESS_EQUAL:          return "TOKEN_LESS_EQUAL";
-        case tokentype::TOKEN_GREATER:             return "TOKEN_GREATER";
-        case tokentype::TOKEN_GREATER_EQUAL:       return "TOKEN_GREATER_EQUAL";
-        case tokentype::TOKEN_EQUAL:               return "TOKEN_EQUAL";
-        case tokentype::TOKEN_NOT_EQUAL:           return "TOKEN_NOT_EQUAL";
-        case tokentype::TOKEN_ASSIGN:              return "TOKEN_ASSIGN";
-        case tokentype::TOKEN_NOT:                 return "TOKEN_NOT";
-        case tokentype::TOKEN_LEFT_PARENTHESES:    return "TOKEN_LEFT_PARENTHESES";
-        case tokentype::TOKEN_RIGHT_PARENTHESES:   return "TOKEN_RIGHT_PARENTHESES";
-        case tokentype::TOKEN_LEFT_BRACKET:        return "TOKEN_LEFT_BRACKET";
-        case tokentype::TOKEN_RIGHT_BRACKET:       return "TOKEN_RIGHT_BRACKET";
-        case tokentype::TOKEN_LEFT_BRACE:          return "TOKEN_LEFT_BRACE";
-        case tokentype::TOKEN_RIGHT_BRACE:         return "TOKEN_RIGHT_BRACE";
-        case tokentype::TOKEN_AND:                 return "TOKEN_AND";
-        case tokentype::TOKEN_OR:                  return "TOKEN_OR";
-        case tokentype::TOKEN_DOT:                 return "TOKEN_DOT";
-        case tokentype::TOKEN_AT:                  return "TOKEN_AT";
-        case tokentype::TOKEN_INTEGER:             return "TOKEN_INTEGER";
-        case tokentype::TOKEN_STRING:              return "TOKEN_STRING";
-        case tokentype::TOKEN_COLON:               return "TOKEN_COLON";
-        case tokentype::TOKEN_SEMICOLON:           return "TOKEN_SEMICOLON";
-        case tokentype::TOKEN_COMMA:               return "TOKEN_COMMA";
-        case tokentype::TOKEN_REAL:                return "TOKEN_REAL";
+        case TokenType::TOKEN_EOF:                 return "TOKEN_EOF";
+        case TokenType::TOKEN_PLUS:                return "TOKEN_PLUS";
+        case TokenType::TOKEN_MINUS:               return "TOKEN_MINUS";
+        case TokenType::TOKEN_MULTIPLY:            return "TOKEN_MULTIPLY";
+        case TokenType::TOKEN_DIVIDE:              return "TOKEN_DIVIDE";
+        case TokenType::TOKEN_IDENTIFIER:          return "TOKEN_IDENTIFIER";
+        case TokenType::TOKEN_EXPONENT:            return "TOKEN_EXPONENT";
+        case TokenType::TOKEN_LESS:                return "TOKEN_LESS";
+        case TokenType::TOKEN_LESS_EQUAL:          return "TOKEN_LESS_EQUAL";
+        case TokenType::TOKEN_GREATER:             return "TOKEN_GREATER";
+        case TokenType::TOKEN_GREATER_EQUAL:       return "TOKEN_GREATER_EQUAL";
+        case TokenType::TOKEN_EQUAL:               return "TOKEN_EQUAL";
+        case TokenType::TOKEN_NOT_EQUAL:           return "TOKEN_NOT_EQUAL";
+        case TokenType::TOKEN_ASSIGN:              return "TOKEN_ASSIGN";
+        case TokenType::TOKEN_NOT:                 return "TOKEN_NOT";
+        case TokenType::TOKEN_LEFT_PARENTHESES:    return "TOKEN_LEFT_PARENTHESES";
+        case TokenType::TOKEN_RIGHT_PARENTHESES:   return "TOKEN_RIGHT_PARENTHESES";
+        case TokenType::TOKEN_LEFT_BRACKET:        return "TOKEN_LEFT_BRACKET";
+        case TokenType::TOKEN_RIGHT_BRACKET:       return "TOKEN_RIGHT_BRACKET";
+        case TokenType::TOKEN_LEFT_BRACE:          return "TOKEN_LEFT_BRACE";
+        case TokenType::TOKEN_RIGHT_BRACE:         return "TOKEN_RIGHT_BRACE";
+        case TokenType::TOKEN_AND:                 return "TOKEN_AND";
+        case TokenType::TOKEN_OR:                  return "TOKEN_OR";
+        case TokenType::TOKEN_DOT:                 return "TOKEN_DOT";
+        case TokenType::TOKEN_AT:                  return "TOKEN_AT";
+        case TokenType::TOKEN_INTEGER:             return "TOKEN_INTEGER";
+        case TokenType::TOKEN_STRING:              return "TOKEN_STRING";
+        case TokenType::TOKEN_COLON:               return "TOKEN_COLON";
+        case TokenType::TOKEN_SEMICOLON:           return "TOKEN_SEMICOLON";
+        case TokenType::TOKEN_COMMA:               return "TOKEN_COMMA";
+        case TokenType::TOKEN_REAL:                return "TOKEN_REAL";
         default: NOREACH("Unknown token type.");
 
     }
@@ -102,19 +102,19 @@ get_type_string() const
 
 }
 
-i32 token::
+i32 Token::
 get_line() const
 {
     return this->line;
 }
 
-i32 token::
+i32 Token::
 get_column() const
 {
     return this->column;
 }
 
-string token::
+string Token::
 format() const
 {
 
@@ -126,7 +126,7 @@ format() const
     result += "): ";
     result += this->get_type_string();
     result += " ";
-    if (this->type != tokentype::TOKEN_STRING)
+    if (this->type != TokenType::TOKEN_STRING)
         result += this->reference;
     else
         result += this->parse_reference_as_string();
@@ -135,7 +135,7 @@ format() const
 
 }
 
-string token::
+string Token::
 parse_reference_as_string() const
 {
 
