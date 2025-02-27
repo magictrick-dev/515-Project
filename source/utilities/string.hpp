@@ -2,6 +2,11 @@
 #define SOURCE_UTILITIES_STRING_HPP
 #include <definitions.hpp>
 #include <iostream>
+#include <string>
+
+using std::string;
+
+#if 0
 
 // --- String ------------------------------------------------------------------
 //
@@ -67,5 +72,7 @@ class string
 std::ostream& operator<<(std::ostream &stream, const string &str);
 string operator+(ccptr lhs, const string &rhs);
 string operator+(const string &lhs, ccptr rhs);
+
+#endif
 
 #endif

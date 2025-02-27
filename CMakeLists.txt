@@ -53,10 +53,20 @@ ADD_EXECUTABLE(ncc
     "source/compiler/graph.cpp"
     "source/compiler/environment.hpp"
     "source/compiler/environment.cpp"
+
     "source/compiler/lexer/token.hpp"
     "source/compiler/lexer/token.cpp"
     "source/compiler/lexer/tokenizer.hpp"
     "source/compiler/lexer/tokenizer.cpp"
+    
+    "source/compiler/parser/node.hpp"
+    "source/compiler/parser/node.cpp"
+    "source/compiler/parser/subnodes.hpp"
+    "source/compiler/parser/subnodes.cpp"
+    "source/compiler/parser/parser.hpp"
+    "source/compiler/parser/parser.cpp"
+    "source/compiler/parser/visitor.hpp"
+    "source/compiler/parser/visitor.cpp"
 
     "source/platform/filesystem.hpp"
     "source/platform/system.hpp"

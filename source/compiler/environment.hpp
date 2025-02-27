@@ -15,7 +15,6 @@ class Environment
 
     protected:
         
-        
 };
 
 #endif

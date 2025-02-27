@@ -120,9 +120,9 @@ format() const
 
     string result = this->source;
     result += "(";
-    result += this->line;
+    result += std::to_string(this->line);
     result += ",";
-    result += this->column;
+    result += std::to_string(this->column);
     result += "): ";
     result += this->get_type_string();
     result += " ";

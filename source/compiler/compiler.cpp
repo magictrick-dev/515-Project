@@ -1,7 +1,9 @@
 #include <compiler/compiler.hpp>
+#include <compiler/parser/parser.hpp>
 
 Compiler::
 Compiler()
+    : parser(&this->environment, &this->graph)
 {
 
 }
@@ -13,11 +15,12 @@ Compiler::
 }
 
 bool Compiler::
-parse(string source)
+compile(string source)
 {
 
-    
+    if (!this->parser.parse(source))
+        return false;
 
-    return false;
+    return true;
 
 }

@@ -3,6 +3,8 @@
 #include <utilities/allocators.hpp>
 #include <utilities/intrinsics.hpp>
 
+#if 0
+
 // Uncle bob stans be shoketh
 static char scratch_buffer[256];
 
@@ -366,3 +368,4 @@ operator+(const string &lhs, ccptr rhs)
 
 }
 
+#endif

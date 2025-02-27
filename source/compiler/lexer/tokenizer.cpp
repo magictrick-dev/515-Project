@@ -685,7 +685,7 @@ match_numbers()
                 if (peek == 'e' || peek == 'E')
                 {
                     type = TokenType::TOKEN_ERROR_INVALID_REAL;
-                    this->advance();
+                    break;
                 }
 
                 if (type == TokenType::TOKEN_INTEGER)
@@ -738,8 +738,6 @@ match_numbers()
                     else
                     {
                         type = TokenType::TOKEN_ERROR_INVALID_REAL;
-                        this->advance();
-                        this->advance();
                         break;
                     }
 
@@ -748,7 +746,6 @@ match_numbers()
                 else
                 {
                     type = TokenType::TOKEN_ERROR_INVALID_REAL;
-                    this->advance();
                     break;
                 }
 

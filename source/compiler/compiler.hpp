@@ -4,6 +4,7 @@
 #include <compiler/environment.hpp>
 #include <compiler/graph.hpp>
 #include <utilities/string.hpp>
+#include <compiler/parser/parser.hpp>
 
 class Compiler
 {
@@ -11,12 +12,13 @@ class Compiler
     public:
                     Compiler();
         virtual    ~Compiler();
-
-        bool        parse(string source);
+        
+        bool        compile(string source);
 
     protected:
-        Environment environment;
-        Graph graph;
+        SyntaxParser    parser;
+        Environment     environment;
+        Graph           graph;
 
 };
 

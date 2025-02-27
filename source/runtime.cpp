@@ -34,6 +34,7 @@
 #include <utilities/buffer.hpp>
 #include <utilities/allocators.hpp>
 #include <utilities/filepath.hpp>
+#include <compiler/compiler.hpp>
 
 int
 runtime(int argc, char ** argv)
@@ -64,11 +65,7 @@ runtime(int argc, char ** argv)
 
         // Get the canonical path.
         filepath canonical_source_file = source_file.canonicalize();
-        if (!canonical_source_file.is_file())
-        {
-            std::cout << "Invalid file path: " << canonical_source_file.str() << std::endl;
-            return 1;
-        }
+        std::cout << "-- User supplied " << canonical_source_file.c_str() << std::endl;
 
 #if 0
         // Read the entire file into memory.
@@ -104,6 +101,7 @@ runtime(int argc, char ** argv)
         std::cout << lexer.current_token->format() << std::endl;
 #endif
 
+#if 0
         Tokenizer tokenizer;
         tokenizer.initialize(canonical_source_file.c_str());
 
@@ -112,6 +110,19 @@ runtime(int argc, char ** argv)
             if (tokenizer.current_token_is(TokenType::TOKEN_EOF)) break;
             std::cout << tokenizer.get_current_token().format() << std::endl;
             tokenizer.shift();
+        }
+#endif
+        
+        Compiler compiler;
+        if (!compiler.compile(canonical_source_file.c_str()))
+        {
+            std::cout << "-- Unable to compile." << std::endl;
+            return 1;
+        }
+        
+        else
+        {
+            std::cout << "-- Compilation successful." << std::endl;
         }
 
     }
