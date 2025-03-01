@@ -7,6 +7,18 @@ visit(SyntaxNodeRoot *node)
 }
 
 void SyntaxNodeVisitor::
+visit(SyntaxNodeBody *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
+visit(SyntaxNodeExpressionStatement *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
 visit(SyntaxNodeExpression *node)
 {
     return;

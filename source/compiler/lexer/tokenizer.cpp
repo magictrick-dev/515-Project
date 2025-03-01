@@ -81,6 +81,30 @@ get_current_token() const
 
 }
 
+TokenType Tokenizer::
+get_previous_token_type() const
+{
+
+    return this->previous_token->get_type();
+
+}
+
+TokenType Tokenizer::
+get_current_token_type() const
+{
+
+    return this->current_token->get_type();
+
+}
+
+TokenType Tokenizer::
+get_next_token_type() const
+{
+
+    return this->next_token->get_type();
+
+}
+
 Token Tokenizer::
 get_next_token() const
 {
@@ -114,6 +138,39 @@ next_token_is(TokenType type) const
 {
 
     if (this->next_token->get_type() == type)
+        return true;
+    return false;
+
+}
+
+bool Tokenizer::
+previous_token_is(TokenType type, string reference) const
+{
+
+    if (this->previous_token->get_type() == type &&
+        this->previous_token->get_reference() == reference)
+        return true;
+    return false;
+
+}
+
+bool Tokenizer::
+current_token_is(TokenType type, string reference) const
+{
+
+    if (this->current_token->get_type() == type &&
+        this->current_token->get_reference() == reference)
+        return true;
+    return false;
+
+}
+
+bool Tokenizer::
+next_token_is(TokenType type, string reference) const
+{
+
+    if (this->next_token->get_type() == type &&
+        this->next_token->get_reference() == reference)
         return true;
     return false;
 

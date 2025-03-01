@@ -22,6 +22,13 @@ class Tokenizer
         bool            previous_token_is(TokenType type) const;
         bool            current_token_is(TokenType type) const;
         bool            next_token_is(TokenType type) const;
+        bool            previous_token_is(TokenType type, string reference) const;
+        bool            current_token_is(TokenType type, string reference) const;
+        bool            next_token_is(TokenType type, string reference) const;
+        
+        TokenType       get_previous_token_type() const;
+        TokenType       get_current_token_type() const;
+        TokenType       get_next_token_type() const;
 
     protected:
         bool            advance();

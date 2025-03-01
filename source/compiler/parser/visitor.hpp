@@ -7,7 +7,11 @@ class SyntaxNodeVisitor
 {
 
     public:
+
         virtual void    visit(SyntaxNodeRoot *node);
+        virtual void    visit(SyntaxNodeBody *node);
+        virtual void    visit(SyntaxNodeExpressionStatement *node);
+
         virtual void    visit(SyntaxNodeExpression *node);
         virtual void    visit(SyntaxNodeTerm *node);
         virtual void    visit(SyntaxNodeFactor *node);

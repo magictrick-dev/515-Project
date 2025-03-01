@@ -2,6 +2,7 @@
 #define SOURCE_COMPILER_PARSER_SUBNODES_HPP
 #include <compiler/parser/node.hpp>
 #include <utilities/string.hpp>
+#include <vector>
 
 // --- Root Syntax Node --------------------------------------------------------
 // 
@@ -21,6 +22,46 @@ class SyntaxNodeRoot : public SyntaxNode
         
     public:
         shared_ptr<SyntaxNode> base_node;
+
+};
+
+// --- Body Syntax Node --------------------------------------------------------
+// 
+// Represents a body of statements.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeBody : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeBody();
+        virtual        ~SyntaxNodeBody();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        std::vector<shared_ptr<SyntaxNode>> statements;
+
+};
+
+// --- Expression Statement Syntax Node -----------------------------------------
+// 
+// Represents a single expression statement.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeExpressionStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeExpressionStatement();
+        virtual        ~SyntaxNodeExpressionStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        shared_ptr<SyntaxNode> expression;
 
 };
 

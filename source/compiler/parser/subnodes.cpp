@@ -24,6 +24,51 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- Body Syntax Node --------------------------------------------------------
+
+SyntaxNodeBody::
+SyntaxNodeBody()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_BODY;
+
+}
+
+SyntaxNodeBody::
+~SyntaxNodeBody()
+{
+    
+}
+
+void SyntaxNodeBody::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+// --- Expression Statement Syntax Node -----------------------------------------
+
+SyntaxNodeExpressionStatement::
+SyntaxNodeExpressionStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_EXPRESSION_STATEMENT;
+    this->expression = nullptr;
+
+}
+
+SyntaxNodeExpressionStatement::
+~SyntaxNodeExpressionStatement()
+{
+    
+}
+
+void SyntaxNodeExpressionStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
 // --- Expression Syntax Node --------------------------------------------------
 
 SyntaxNodeExpression::
