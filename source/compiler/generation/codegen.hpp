@@ -1,6 +1,8 @@
 #ifndef SOURCE_COMPILER_GENERATION_CODEGEN_HPP
 #define SOURCE_COMPILER_GENERATION_CODEGEN_HPP
 #include <compiler/parser/visitor.hpp>
+#include <utilities/buffer.hpp>
+#include <vector>
 
 class CodeGenerator : public SyntaxNodeVisitor
 {
@@ -23,7 +25,7 @@ class CodeGenerator : public SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeGrouping *node) override;
         
     protected:
-
+        memory_buffer   buffer;
 
 };
 
