@@ -815,9 +815,11 @@ match_numbers()
 
         }
 
+        /* OR CAN THEY?
         // Integers can't start with zeros.
         if (type == TokenType::TOKEN_INTEGER && initial_character == '0')
             type = TokenType::TOKEN_ERROR_INVALID_INTEGER;
+        */
 
         *this->next_token = this->create_token(type);
         this->synchronize();

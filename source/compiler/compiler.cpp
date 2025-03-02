@@ -1,5 +1,6 @@
 #include <compiler/compiler.hpp>
 #include <compiler/parser/parser.hpp>
+#include <compiler/reference.hpp>
 
 Compiler::
 Compiler()
@@ -15,12 +16,20 @@ Compiler::
 }
 
 bool Compiler::
-compile(string source)
+compile(string source, bool dump_reference)
 {
 
-    if (!this->parser.parse(source))
-        return false;
+    bool result = this->parser.parse(source);
+    
+    if (dump_reference == true)
+    {
+        
+        std::cout << "-- Displaying tree output." << std::endl;
+        ASTReferenceOutput output;
+        this->parser.accept(&output);
 
-    return true;
+    }
+
+    return result;
 
 }

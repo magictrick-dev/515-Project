@@ -32,6 +32,7 @@ enum class OperationType
     OPERATION_TYPE_MODULUS,
     OPERATION_TYPE_EXPONENT,
     OPERATION_TYPE_NEGATION,
+    OPERATION_TYPE_POSITIVE,
 };
 
 enum class PrimaryType

@@ -22,7 +22,9 @@ parse(string source)
     {
 
         if (!this->tokenizer.initialize(source.c_str()))
-            throw CompilerResourceException(__LINE__, source, "Failed to initialize the tokenizer, filepath is invalid.");
+            throw CompilerResourceException(__LINE__, 
+                source, 
+                "Failed to initialize the tokenizer, filepath is invalid.");
         
         this->source_name = source;
         this->base_node = this->match_root();
@@ -41,6 +43,16 @@ parse(string source)
     }
 
     return true;
+    
+}
+
+void SyntaxParser::
+accept(SyntaxNodeVisitor *visitor)
+{
+    
+    ENSURE_PTR(visitor);
+    
+    this->base_node->accept(visitor);
     
 }
 
@@ -178,7 +190,11 @@ match_expression()
 {
     
     shared_ptr<SyntaxNode> expression = this->match_term();
-    return expression;
+    
+    auto node = this->create_node<SyntaxNodeExpression>();
+    node->expression = expression;
+    return node;
+    
 
 }
 
@@ -271,7 +287,7 @@ match_factor()
         auto right = this->match_magnitude();
         
         // Generate the node.
-        auto term = this->create_node<SyntaxNodeTerm>();
+        auto term = this->create_node<SyntaxNodeFactor>();
         term->left            = left;
         term->right           = right;
         term->operation_type  = operation;
@@ -299,9 +315,10 @@ match_magnitude()
         auto right = this->match_unary();
         
         // Generate the node.
-        auto factor = this->create_node<SyntaxNodeFactor>();
+        auto factor = this->create_node<SyntaxNodeMagnitude>();
         factor->left = left;
         factor->right = right;
+        factor->operation_type = OperationType::OPERATION_TYPE_EXPONENT;
         
         left = factor;
         
@@ -316,7 +333,8 @@ shared_ptr<SyntaxNode> SyntaxParser::
 match_unary()
 {
 
-    if (this->tokenizer.current_token_is(TokenType::TOKEN_MINUS))
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_MINUS) ||
+        this->tokenizer.current_token_is(TokenType::TOKEN_PLUS))
     {
         
         TokenType type = this->tokenizer.get_current_token_type();
@@ -324,6 +342,7 @@ match_unary()
         switch (type)
         {
             case TokenType::TOKEN_MINUS:    operation = OperationType::OPERATION_TYPE_NEGATION; break;
+            case TokenType::TOKEN_PLUS:     operation = OperationType::OPERATION_TYPE_POSITIVE; break;
             default: NOREACH("We should never reach this point."); break;
         }
         
@@ -385,18 +404,21 @@ match_primary()
         if (!this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_PARENTHESES))
         {
             
+            this->tokenizer.shift();
             throw CompilerSyntaxErrorException(__LINE__, 
                 this->source_name,
-                this->tokenizer.get_current_token().get_line(), 
-                this->tokenizer.get_current_token().get_column(), 
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
                 "Expected right parenthesis in expression, encountered: %s",
-                this->tokenizer.get_current_token().get_reference().c_str());
+                this->tokenizer.get_previous_token().get_reference().c_str());
             
         }
         
         this->tokenizer.shift();
         
-        return expression;
+        auto node = this->create_node<SyntaxNodeGrouping>();
+        node->expression = expression;
+        return node;
         
     }
     
@@ -405,7 +427,7 @@ match_primary()
         this->source_name,
         this->tokenizer.get_previous_token().get_line(), 
         this->tokenizer.get_previous_token().get_column(), 
-        "Expected right parenthesis in expression, encountered: %s",
+        "Unexpected token encountered in expression, encountered: %s",
         this->tokenizer.get_previous_token().get_reference().c_str());
     
     NOREACH("We should never reach this point.");

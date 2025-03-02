@@ -31,7 +31,7 @@ class CompilerResourceException : public CompilerException
             
             // NOTE(Chris): This is what we call in the industry as a "code smell".
             // TODO(Chris): Clearly there must be a better way to do this.
-#           pragma warning(push)
+#           if defined(GCC)
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wformat-security"
             i32 size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
@@ -39,7 +39,12 @@ class CompilerResourceException : public CompilerException
             std::snprintf(formatted_message.data(), size_s, format.c_str(), args...);
             formatted_message.pop_back();
 #           pragma GCC diagnostic pop
-#           pragma warning(pop)
+#           else
+            i32 size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+            string formatted_message(size_s, ' ');
+            std::snprintf(formatted_message.data(), size_s, format.c_str(), args...);
+            formatted_message.pop_back();
+#           endif
 
             this->message += formatted_message;
             
@@ -67,12 +72,12 @@ class CompilerSyntaxErrorException : public CompilerException
              uint64_t line, uint64_t column, string format, Args... args)
         {
 
-            this->message = "[" + std::to_string(line_number) + "]: " + resource_name + " (" 
+            this->message = "[" + std::to_string(line_number) + "][Error]: " + resource_name + "(" 
                 + std::to_string(line) + "," + std::to_string(column) + "): ";
 
             // NOTE(Chris): This is what we call in the industry as a "code smell".
             // TODO(Chris): Clearly there must be a better way to do this.
-#           pragma warning(push)
+#           if defined(GCC)
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wformat-security"
             i32 size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
@@ -80,7 +85,12 @@ class CompilerSyntaxErrorException : public CompilerException
             std::snprintf(formatted_message.data(), size_s, format.c_str(), args...);
             formatted_message.pop_back();
 #           pragma GCC diagnostic pop
-#           pragma warning(pop)
+#           else
+            i32 size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;
+            string formatted_message(size_s, ' ');
+            std::snprintf(formatted_message.data(), size_s, format.c_str(), args...);
+            formatted_message.pop_back();
+#           endif
 
             this->message += formatted_message;
 

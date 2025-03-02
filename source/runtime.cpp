@@ -114,9 +114,9 @@ runtime(int argc, char ** argv)
 #endif
         
         Compiler compiler;
-        if (!compiler.compile(canonical_source_file.c_str()))
+        if (!compiler.compile(canonical_source_file.c_str(), true))
         {
-            std::cout << "-- Unable to compile." << std::endl;
+            std::cout << "-- Unable to fully compile, errors detected." << std::endl;
             return 1;
         }
         

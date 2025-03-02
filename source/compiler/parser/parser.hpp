@@ -37,6 +37,7 @@ class SyntaxParser
         virtual        ~SyntaxParser();
 
         bool            parse(string source);
+        void            accept(SyntaxNodeVisitor *visitor);
         
     protected:
         template <typename T, typename ...Args> shared_ptr<T> create_node(Args... args);
