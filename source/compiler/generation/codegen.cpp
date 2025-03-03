@@ -69,6 +69,7 @@ void CodeGenerator::
 visit(SyntaxNodeExpression *node)
 {
 
+    node->expression->accept(this);
 
 }
 
@@ -111,16 +112,13 @@ visit(SyntaxNodePrimary *node)
             std::cout << "Integer: " << value << std::endl;
 
             // MOV EAX, value
-            memory_buffer_write_u8(&this->buffer,   0xB8);
+            memory_buffer_write_u8(&this->buffer, 0xB8);
             
             // IMM32
-            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
-            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
-            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
-            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
+            memory_buffer_write_u32(&this->buffer, value);
             
             // PUSH EAX
-            memory_buffer_write_u8(&this->buffer,   0x50);
+            memory_buffer_write_u8(&this->buffer, 0x50);
             
         } break;
         
