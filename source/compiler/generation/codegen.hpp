@@ -4,12 +4,16 @@
 #include <utilities/buffer.hpp>
 #include <vector>
 
+typedef int (*program_executable_fptr)(void);
+
 class CodeGenerator : public SyntaxNodeVisitor
 {
 
     public:
-                        CodeGenerator();
+                        CodeGenerator(u64 buffer_size);
         virtual        ~CodeGenerator();
+        
+        int             operator()(); // functor fun time
         
         virtual void    visit(SyntaxNodeRoot *node) override;
         virtual void    visit(SyntaxNodeBody *node) override;

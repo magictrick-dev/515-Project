@@ -31,7 +31,7 @@ class CompilerResourceException : public CompilerException
             
             // NOTE(Chris): This is what we call in the industry as a "code smell".
             // TODO(Chris): Clearly there must be a better way to do this.
-#           if defined(GCC)
+#           if defined(__linux__)
 #           pragma GCC diagnostic push
 #           pragma GCC diagnostic ignored "-Wformat-security"
             i32 size_s = std::snprintf(nullptr, 0, format.c_str(), args...) + 1;

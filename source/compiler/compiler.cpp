@@ -1,6 +1,7 @@
 #include <compiler/compiler.hpp>
 #include <compiler/parser/parser.hpp>
 #include <compiler/reference.hpp>
+#include <compiler/generation/codegen.hpp>
 
 Compiler::
 Compiler()
@@ -29,6 +30,9 @@ compile(string source, bool dump_reference)
         this->parser.accept(&output);
 
     }
+    
+    CodeGenerator generator(4*1024*1024);
+    this->parser.accept(&generator);
 
     return result;
 

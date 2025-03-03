@@ -69,6 +69,9 @@ ADD_EXECUTABLE(ncc
     "source/compiler/parser/parser.cpp"
     "source/compiler/parser/visitor.hpp"
     "source/compiler/parser/visitor.cpp"
+    
+    "source/compiler/generation/codegen.hpp"
+    "source/compiler/generation/codegen.cpp"
 
     "source/platform/filesystem.hpp"
     "source/platform/system.hpp"
