@@ -61,7 +61,9 @@ visit(SyntaxNodeExpressionStatement *node)
     memory_buffer_write_u8(&this->buffer,   0xC3);
 
     int result = this->operator()();
-    std::cout << result << std::endl;
+    std::cout << "Executing" << std::endl;
+    std::cout << "    Code Size:  " << this->buffer.position << " bytes" << std::endl;
+    std::cout << "    Result:     " << result << std::endl;
 
 }
 
@@ -76,24 +78,198 @@ visit(SyntaxNodeExpression *node)
 void CodeGenerator::
 visit(SyntaxNodeTerm *node)
 {
+    
+    
+    switch (node->operation_type)
+    {
+        case OperationType::OPERATION_TYPE_ADDITION:
+        {
 
+            // Loads the left side into EAX.
+            node->left->accept(this);
+            
+            // Push left from EAX.
+            memory_buffer_write_u8(&this->buffer,  0x50);
+            
+            // This loads the right side into EAX.
+            node->right->accept(this);
+            
+            // Pop into ECX.
+            memory_buffer_write_u8(&this->buffer,  0x59);
+            
+            // ADD EAX, ECX
+            memory_buffer_write_u8(&this->buffer,  0x01);
+            memory_buffer_write_u8(&this->buffer,  0xC8);
+
+        } break;
+        
+        case OperationType::OPERATION_TYPE_SUBTRACTION:
+        {
+
+            // Loads the right side into EAX.
+            node->right->accept(this);
+
+            // Push right from EAX.
+            memory_buffer_write_u8(&this->buffer,  0x50);
+
+            // This loads the left side into EAX.
+            node->left->accept(this);
+
+            // Pop into ECX.
+            memory_buffer_write_u8(&this->buffer,  0x59);
+
+            // SUB EAX, ECX
+            memory_buffer_write_u8(&this->buffer,  0x29);
+            memory_buffer_write_u8(&this->buffer,  0xC8);
+
+        } break;
+        
+        default:
+        {
+            
+            NOREACH("Invalid or unimplemented operation type.");
+
+        }
+
+    }
+    
 }
 
 void CodeGenerator::
 visit(SyntaxNodeFactor *node)
 {
+    
+    switch (node->operation_type)
+    {
+
+        case OperationType::OPERATION_TYPE_MULTIPLICATION:
+        {
+            
+            // Loads the left side into EAX.
+            node->left->accept(this);
+            
+            // Push left from EAX.
+            memory_buffer_write_u8(&this->buffer,  0x50);
+            
+            // This loads the right side into EAX.
+            node->right->accept(this);
+            
+            // Pop into ECX.
+            memory_buffer_write_u8(&this->buffer,  0x59);
+
+            // IMUL EDX:EAX, ECX
+            memory_buffer_write_u8(&this->buffer,  0xF7);
+            memory_buffer_write_u8(&this->buffer,  0xE9);
+
+        } break;
+        
+        case OperationType::OPERATION_TYPE_DIVISION:
+        {
+            
+            // Loads the right side into EAX.
+            node->right->accept(this);
+
+            // Push right from EAX.
+            memory_buffer_write_u8(&this->buffer,  0x50);
+
+            // This loads the left side into EAX.
+            node->left->accept(this);
+
+            // Pop into ECX.
+            memory_buffer_write_u8(&this->buffer,  0x59);
+            
+            // Sign extend EAX into EDX:EAX.
+            memory_buffer_write_u8(&this->buffer,  0x99);
+
+            // IDIV EDX:EAX, ECX
+            memory_buffer_write_u8(&this->buffer,  0xF7);
+            memory_buffer_write_u8(&this->buffer,  0xF9);
+
+        } break;
+        
+        case OperationType::OPERATION_TYPE_MODULUS:
+        {
+            
+            // Loads the right side into EAX.
+            node->right->accept(this);
+
+            // Push right from EAX.
+            memory_buffer_write_u8(&this->buffer,  0x50);
+
+            // This loads the left side into EAX.
+            node->left->accept(this);
+
+            // Pop into ECX.
+            memory_buffer_write_u8(&this->buffer,  0x59);
+            
+            // Sign extend EAX into EDX.
+            memory_buffer_write_u8(&this->buffer,  0x99);
+
+            // IDIV EDX:EAX, ECX
+            memory_buffer_write_u8(&this->buffer,  0xF7);
+            memory_buffer_write_u8(&this->buffer,  0xF9);
+            
+            // XCHG EAX, EDX
+            memory_buffer_write_u8(&this->buffer,  0x92);
+
+        } break;
+
+    }
 
 }
 
 void CodeGenerator::
 visit(SyntaxNodeMagnitude *node)
 {
+    
+    switch (node->operation_type)
+    {
+
+        case OperationType::OPERATION_TYPE_EXPONENT:
+        {
+            
+            // For this assignment, we won't be doing exponentiation. Return LHS.
+            node->left->accept(this);
+
+        } break;
+
+    }
 
 }
 
 void CodeGenerator::
 visit(SyntaxNodeUnary *node)
 {
+    
+    switch (node->operation_type)
+    {
+        
+        case OperationType::OPERATION_TYPE_POSITIVE:
+        {
+            
+            node->right->accept(this);
+            
+        } break;
+        
+        case OperationType::OPERATION_TYPE_NEGATION:
+        {
+            
+            node->right->accept(this);
+            
+            // NEG EAX
+            memory_buffer_write_u8(&this->buffer,  0xF7);
+            memory_buffer_write_u8(&this->buffer,  0xD8);
+            
+        } break;
+        
+        default:
+        {
+            
+            NOREACH("Invalid or unimplemented operation type.");
+            
+        }
+        
+    }
 
 }
 
@@ -109,16 +285,15 @@ visit(SyntaxNodePrimary *node)
         {
             
             i32 value = std::stoi(node->value);
-            std::cout << "Integer: " << value << std::endl;
 
             // MOV EAX, value
-            memory_buffer_write_u8(&this->buffer, 0xB8);
+            memory_buffer_write_u8(&this->buffer,   0xB8);
             
             // IMM32
-            memory_buffer_write_u32(&this->buffer, value);
-            
-            // PUSH EAX
-            memory_buffer_write_u8(&this->buffer, 0x50);
+            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
             
         } break;
         
@@ -137,5 +312,7 @@ visit(SyntaxNodePrimary *node)
 void CodeGenerator::
 visit(SyntaxNodeGrouping *node)
 {
+    
+    node->expression->accept(this);
 
 }
