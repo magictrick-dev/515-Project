@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cassert>
+#include <cstring>
 #include <memory>
 
 typedef uint8_t         u8;

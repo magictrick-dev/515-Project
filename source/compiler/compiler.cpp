@@ -35,7 +35,7 @@ compile(string source, bool dump_reference)
     this->parser.accept(&generator);
     generator();
 
-    std::cout << "-- Compilation complete." << std::endl;
+    std::cout << "\n-- Runtime complete. (Newline is automatically added.)" << std::endl;
 
     return result;
 
