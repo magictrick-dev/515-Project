@@ -76,7 +76,7 @@ visit(SyntaxNodePrintStatement *node)
                 memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
                 memory_buffer_write_u8(&this->buffer, 0xC7);
 
-                u64 print_cast = (u64)print_int; // Dirty cast the pointer.
+                int64_t print_cast = (int64_t)print_int; // Dirty cast the pointer.
 
                 memory_buffer_write_u8(&this->buffer, 0x48); // MOV ESI, [print_int]
                 memory_buffer_write_u8(&this->buffer, 0xBE);
@@ -99,7 +99,7 @@ visit(SyntaxNodePrintStatement *node)
                 memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
                 memory_buffer_write_u8(&this->buffer, 0xC7);
 
-                u64 print_cast = (u64)print_string; // Dirty cast the pointer.
+                long int print_cast = (long int)print_string; // Dirty cast the pointer.
 
                 memory_buffer_write_u8(&this->buffer, 0x48); // MOV ESI, [print_int]
                 memory_buffer_write_u8(&this->buffer, 0xBE);

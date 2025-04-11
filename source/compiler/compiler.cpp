@@ -35,6 +35,8 @@ compile(string source, bool dump_reference)
     this->parser.accept(&generator);
     generator();
 
+    std::cout << "-- Compilation complete." << std::endl;
+
     return result;
 
 }
