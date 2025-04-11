@@ -33,6 +33,7 @@ compile(string source, bool dump_reference)
     
     CodeGenerator generator(4*1024*1024);
     this->parser.accept(&generator);
+    generator();
 
     return result;
 

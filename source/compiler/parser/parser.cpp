@@ -68,6 +68,90 @@ create_node(Args... args)
     
 }
 
+TokenType SyntaxParser::
+get_previous_token_type() const
+{
+
+    return this->tokenizer.get_previous_token_type();
+
+}
+
+TokenType SyntaxParser::
+get_current_token_type() const
+{
+
+    return this->tokenizer.get_current_token_type();
+
+}
+
+TokenType SyntaxParser::
+get_next_token_type() const
+{
+
+    return this->tokenizer.get_next_token_type();
+
+}
+
+bool SyntaxParser::
+is_previous_token_type(TokenType type) const
+{
+
+    bool result = (this->get_previous_token_type() == type);
+    return result;
+
+}
+
+bool SyntaxParser::
+is_current_token_type(TokenType type) const
+{
+
+    bool result = (this->get_current_token_type() == type);
+    return result;
+
+}
+
+bool SyntaxParser::
+is_next_token_type(TokenType type) const
+{
+
+    bool result = (this->get_next_token_type() == type);
+    return result;
+
+}
+
+void SyntaxParser::
+consume_current_token_as(TokenType type, u64 where)
+{
+
+    if (!this->is_current_token_type(type))
+    {
+        throw CompilerSyntaxErrorException(where, 
+            this->source_name,
+            this->tokenizer.get_current_token().get_line(), 
+            this->tokenizer.get_current_token().get_column(), 
+            "Unexpected token found in statement: %s, expecting %s.",
+            this->tokenizer.get_current_token().get_reference().c_str(),
+            get_type_string(type));
+    }
+
+    this->tokenizer.shift();
+
+}
+
+void SyntaxParser::
+synchronize_to(TokenType type)
+{
+
+    while (!this->is_current_token_type(TokenType::TOKEN_EOF))
+    {
+
+        if (this->is_current_token_type(type)) break;
+        this->tokenizer.shift();
+
+    }
+
+}
+
 // --- Matching Functions ------------------------------------------------------
 
 shared_ptr<SyntaxNode> SyntaxParser::
@@ -120,6 +204,33 @@ match_statements()
     
     switch (this->tokenizer.get_current_token_type())
     {
+
+        case TokenType::TOKEN_IDENTIFIER:
+        {
+
+            Token current_token = this->tokenizer.get_current_token();
+
+            if (current_token.get_reference() == "print")
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> print_statement = this->match_print_statement();
+                    return print_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+
+                }
+
+            }
+
+        };
         
         // NOTE(Chris): If we don't match anything, it's an expression statement.
         default:
@@ -158,30 +269,76 @@ match_statements()
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
+match_print_statement()
+{
+
+    Token current_token = this->tokenizer.get_current_token();
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_LEFT_PARENTHESES, __LINE__);
+
+    std::vector<shared_ptr<SyntaxNode>> expressions;
+    while (!this->is_current_token_type(TokenType::TOKEN_EOF))
+    {
+
+        if (this->is_current_token_type(TokenType::TOKEN_RIGHT_PARENTHESES)) break;
+
+        auto expression = this->match_expression();
+        expressions.push_back(expression);
+
+        // Whoopsies, we have a comma without an expression!
+        if (this->is_current_token_type(TokenType::TOKEN_COMMA) &&
+            this->is_next_token_type(TokenType::TOKEN_RIGHT_PARENTHESES))
+        {
+
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_current_token().get_line(), 
+                this->tokenizer.get_current_token().get_column(), 
+                "Expression in print statement after comma.");
+
+        }
+
+    }
+
+    this->consume_current_token_as(TokenType::TOKEN_RIGHT_PARENTHESES, __LINE__);
+
+    if (expressions.size() <= 0)
+    {
+
+        throw CompilerSyntaxErrorException(__LINE__, 
+            this->source_name,
+            current_token.get_line(), 
+            current_token.get_column(), 
+            "Print statement expected at least one valid parameter.");
+
+    }
+
+    this->consume_current_token_as(TokenType::TOKEN_SEMICOLON, __LINE__);
+
+    auto print_statement = this->create_node<SyntaxNodePrintStatement>();
+    print_statement->expressions = expressions;
+    return print_statement;
+
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_read_statement()
+{
+
+    NOREACH("We should never reach this point or return nullptr.");
+    return nullptr;
+
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
 match_expression_statement()
 {
     
-    try
-    {
-
-        shared_ptr<SyntaxNode> expression = this->match_expression();
-        
-        auto statement = this->create_node<SyntaxNodeExpressionStatement>();
-        statement->expression = expression;
-        return statement;
-
-    }
-    catch (CompilerException &exception)
-    {
-        
-        // Synchronize and output error.
-        throw;
-        
-    }
+    shared_ptr<SyntaxNode> expression = this->match_expression();
     
-    // Technically, this error would never occur.
-    NOREACH("We should never reach this point or return nullptr.");
-    return nullptr;
+    auto statement = this->create_node<SyntaxNodeExpressionStatement>();
+    statement->expression = expression;
+    return statement;
 
 }
 
@@ -192,7 +349,8 @@ match_expression()
     shared_ptr<SyntaxNode> expression = this->match_term();
     
     auto node = this->create_node<SyntaxNodeExpression>();
-    node->expression = expression;
+    node->expression        = expression;
+    node->evaluation_type   = expression->evaluation_type;
     return node;
     
 
@@ -222,12 +380,24 @@ match_term()
         
         // Get the right term.
         auto right = this->match_factor();
+
+        if (left->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL ||
+            right->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected string literal in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
         
         // Generate the node.
         auto expression = this->create_node<SyntaxNodeTerm>();
         expression->left            = left;
         expression->right           = right;
         expression->operation_type  = operation;
+        expression->evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
         
         left = expression;
         
@@ -285,12 +455,24 @@ match_factor()
         
         // Get the right term.
         auto right = this->match_magnitude();
+
+        if (left->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL ||
+            right->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected string literal in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
         
         // Generate the node.
         auto term = this->create_node<SyntaxNodeFactor>();
         term->left            = left;
         term->right           = right;
         term->operation_type  = operation;
+        term->evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
         
         left = term;
         
@@ -314,11 +496,23 @@ match_magnitude()
         // Get the right term.
         auto right = this->match_unary();
         
+        if (left->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL ||
+            right->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected string literal in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
+        
         // Generate the node.
         auto factor = this->create_node<SyntaxNodeMagnitude>();
-        factor->left = left;
-        factor->right = right;
-        factor->operation_type = OperationType::OPERATION_TYPE_EXPONENT;
+        factor->left                = left;
+        factor->right               = right;
+        factor->operation_type      = OperationType::OPERATION_TYPE_EXPONENT;
+        factor->evaluation_type     = EvaluationType::EVALUATION_TYPE_INT4;
         
         left = factor;
         
@@ -349,10 +543,22 @@ match_unary()
         this->tokenizer.shift();
         
         auto primary = this->match_primary();
+
+        if (primary->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected string literal in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+
+        }
         
         auto unary = this->create_node<SyntaxNodeUnary>();
         unary->operation_type   = operation;
         unary->right            = primary;
+        unary->evaluation_type  = primary->evaluation_type;
         
         return unary;
         
@@ -376,19 +582,43 @@ match_primary()
         Token token = this->tokenizer.get_current_token();
         this->tokenizer.shift();
         
-        PrimaryType type = PrimaryType::PRIMARY_TYPE_NULL;
+        PrimaryType primary_type = PrimaryType::PRIMARY_TYPE_NULL;
+        EvaluationType evaluation_type = EvaluationType::EVALUATION_TYPE_NULL;
         switch (token.get_type())
         {
-            case TokenType::TOKEN_INTEGER: type = PrimaryType::PRIMARY_TYPE_INTEGER; break;
-            case TokenType::TOKEN_REAL:    type = PrimaryType::PRIMARY_TYPE_FLOAT; break;
-            case TokenType::TOKEN_STRING:  type = PrimaryType::PRIMARY_TYPE_STRING; break;
+
+            case TokenType::TOKEN_INTEGER: 
+            {
+
+                primary_type = PrimaryType::PRIMARY_TYPE_INTEGER;
+                evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
+
+
+            } break;
+
+            case TokenType::TOKEN_REAL:    
+            {
+
+                primary_type = PrimaryType::PRIMARY_TYPE_FLOAT;
+                evaluation_type = EvaluationType::EVALUATION_TYPE_FLOAT;
+
+            } break;
+
+            case TokenType::TOKEN_STRING:
+            {
+
+                primary_type = PrimaryType::PRIMARY_TYPE_STRING;
+                evaluation_type = EvaluationType::EVALUATION_TYPE_STRING_LITERAL;
+
+            }
+
             default: NOREACH("We should never reach this point."); break;
         }
 
         auto node = this->create_node<SyntaxNodePrimary>();
-        node->value         = token.get_reference();
-        node->primary_type  = type;
-        
+        node->value             = token.get_reference();
+        node->primary_type      = primary_type;
+        node->evaluation_type   = evaluation_type;
         return node;
         
     }
@@ -415,10 +645,7 @@ match_primary()
         }
         
         this->tokenizer.shift();
-        
-        auto node = this->create_node<SyntaxNodeGrouping>();
-        node->expression = expression;
-        return node;
+        return expression;
         
     }
     

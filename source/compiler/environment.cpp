@@ -3,23 +3,113 @@
 Environment::
 Environment()
 {
+
+    // String intern table.
+    this->string_buffer_size    = 1024*1024;
+    this->string_buffer_pointer = malloc(this->string_buffer_size);
+    this->string_buffer_offset  = 0;
+
+    // Symbol table.
+    this->symbol_buffer_size    = 1024*1024;
+    this->symbol_buffer_pointer = malloc(this->symbol_buffer_size);
+    this->symbol_buffer_offset  = 0;
+
+    // Null-terminate the entire buffer.
+    for (u64 i = 0; i < this->string_buffer_size; ++i)
+    {
+        *((char*)this->string_buffer_pointer + i) = '\0';
+    }
+
+    // Zero out the memory.
+    for (u64 i = 0; i < this->symbol_buffer_size; ++i)
+    {
+        *((char*)this->symbol_buffer_pointer + i) = 0x00;
+    }
     
 }
 
 Environment::
 ~Environment()
 {
+
+    if (this->symbol_buffer_pointer != NULL)
+    {
+
+        free(this->symbol_buffer_pointer);
+        this->symbol_buffer_pointer = NULL;
+
+    }
+
+    if (this->string_buffer_pointer != NULL)
+    {
+
+        free(this->string_buffer_pointer);
+        this->string_buffer_pointer = NULL;
+
+    }
     
 }
 
-void Environment::
-push_table()
+vptr Environment::
+string_insert(ccptr string)
 {
-    
+
+    // Prevent duplicates??
+    if (this->string_table.find(string) != this->string_table.end())
+    {
+
+        return this->string_table[string];
+
+    }
+
+    // Do some memory magic.
+    char* offset = (char*)this->string_buffer_pointer + this->string_buffer_offset;
+    u64 string_length = strlen(string) + 1;
+    for (u64 i = 0; i < string_length; ++i)
+    {
+        
+        offset[i] = string[i];
+
+    }
+
+    this->string_buffer_offset += string_length;
+    return (vptr)offset;
+
 }
 
-void Environment::
-pop_table()
+bool Environment::
+symbol_exists(ccptr name)
 {
-    
+
+    bool exists = this->symbol_table.find(name) != this->symbol_table.end();
+    return exists;
+
+}
+
+vptr Environment::
+symbol_insert(ccptr name)
+{
+
+    char* offset = (char*)this->symbol_buffer_pointer + this->symbol_buffer_offset;
+    this->symbol_buffer_offset += ALIGNMENT(sizeof(int32_t), 8);
+
+    this->symbol_table[name] = (vptr)offset;
+    return (vptr)offset;
+
+}
+
+vptr Environment::
+symbol_search(ccptr name)
+{
+
+    vptr result = nullptr;
+    if (this->symbol_table.find(name) != this->symbol_table.end())
+    {
+
+        result = this->symbol_table[name];
+
+    }
+
+    return result;
+
 }

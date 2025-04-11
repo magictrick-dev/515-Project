@@ -46,6 +46,29 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- Print Statement Syntax Node ---------------------------------------------
+
+SyntaxNodePrintStatement::
+SyntaxNodePrintStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_PRINT_STATEMENT;
+
+}
+
+SyntaxNodePrintStatement::
+~SyntaxNodePrintStatement()
+{
+    
+}
+
+void SyntaxNodePrintStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+
 // --- Expression Statement Syntax Node -----------------------------------------
 
 SyntaxNodeExpressionStatement::
@@ -215,25 +238,3 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
-// --- Grouping Syntax Node ----------------------------------------------------
-
-SyntaxNodeGrouping::
-SyntaxNodeGrouping()
-{
-
-    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_GROUPING;
-    this->expression = nullptr;
-
-}
-
-SyntaxNodeGrouping::
-~SyntaxNodeGrouping()
-{
-    
-}
-
-void SyntaxNodeGrouping::
-accept(SyntaxNodeVisitor *visitor)
-{
-    visitor->visit(this);
-}

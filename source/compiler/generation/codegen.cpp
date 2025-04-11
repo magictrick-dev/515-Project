@@ -1,5 +1,11 @@
 #include <compiler/generation/codegen.hpp>
+#include <compiler/generation/intrinsics.hpp>
 #include <platform/system.hpp>
+
+// --- Code Generation ---------------------------------------------------------
+//
+// Underlying code generation routine.
+//
 
 CodeGenerator::
 CodeGenerator(u64 buffer_size)
@@ -33,6 +39,7 @@ visit(SyntaxNodeRoot *node)
 {
 
     node->base_node->accept(this);
+    memory_buffer_write_u8(&this->buffer, 0xC3);
 
 }
 
@@ -50,6 +57,81 @@ visit(SyntaxNodeBody *node)
 }
 
 void CodeGenerator::
+visit(SyntaxNodePrintStatement *node)
+{
+
+    for (auto expression : node->expressions)
+    {
+
+        // Loads everything into EAX.
+        expression->accept(this);
+
+        // Now generate.
+        switch (expression->evaluation_type)
+        {
+
+            case EvaluationType::EVALUATION_TYPE_INT4:
+            {
+
+                memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
+                memory_buffer_write_u8(&this->buffer, 0xC7);
+
+                u64 print_cast = (u64)print_int; // Dirty cast the pointer.
+
+                memory_buffer_write_u8(&this->buffer, 0x48); // MOV ESI, [print_int]
+                memory_buffer_write_u8(&this->buffer, 0xBE);
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, 0xFF);
+                memory_buffer_write_u8(&this->buffer, 0xD6);
+
+            } break;
+
+            case EvaluationType::EVALUATION_TYPE_STRING_LITERAL:
+            {
+
+                memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
+                memory_buffer_write_u8(&this->buffer, 0xC7);
+
+                u64 print_cast = (u64)print_string; // Dirty cast the pointer.
+
+                memory_buffer_write_u8(&this->buffer, 0x48); // MOV ESI, [print_int]
+                memory_buffer_write_u8(&this->buffer, 0xBE);
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, 0xFF);
+                memory_buffer_write_u8(&this->buffer, 0xD6);
+
+            } break;
+
+            default:
+            {
+
+                ENSURE(!"Unimplemented evaluation type condition.");
+                
+            }
+
+        }
+
+    }
+
+    return;
+
+}
+
+void CodeGenerator::
 visit(SyntaxNodeExpressionStatement *node)
 {
     
@@ -57,13 +139,12 @@ visit(SyntaxNodeExpressionStatement *node)
 
     node->expression->accept(this);
 
-    // RET
-    memory_buffer_write_u8(&this->buffer,   0xC3);
-
+    /*
     int result = this->operator()();
     std::cout << "Executing" << std::endl;
     std::cout << "    Code Size:  " << this->buffer.position << " bytes" << std::endl;
     std::cout << "    Result:     " << result << std::endl;
+    */
 
 }
 
@@ -309,10 +390,3 @@ visit(SyntaxNodePrimary *node)
 
 }
 
-void CodeGenerator::
-visit(SyntaxNodeGrouping *node)
-{
-    
-    node->expression->accept(this);
-
-}

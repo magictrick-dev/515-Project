@@ -49,11 +49,11 @@ get_type() const
     return this->type;
 }
 
-string Token::
-get_type_string() const
+string
+get_type_string(TokenType type)
 {
 
-    switch (this->type)
+    switch (type)
     {
 
         case TokenType::TOKEN_NULL:                     return "TOKEN_NULL";
@@ -124,7 +124,7 @@ format() const
     result += ",";
     result += std::to_string(this->column);
     result += "): ";
-    result += this->get_type_string();
+    result += get_type_string(this->type);
     result += " ";
     if (this->type != TokenType::TOKEN_STRING)
         result += this->reference;

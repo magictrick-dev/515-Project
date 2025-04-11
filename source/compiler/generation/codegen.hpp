@@ -18,6 +18,7 @@ class CodeGenerator : public SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeRoot *node) override;
         virtual void    visit(SyntaxNodeBody *node) override;
         
+        virtual void    visit(SyntaxNodePrintStatement *node) override;
         virtual void    visit(SyntaxNodeExpressionStatement *node) override;
         
         virtual void    visit(SyntaxNodeExpression *node) override;
@@ -26,7 +27,6 @@ class CodeGenerator : public SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeMagnitude *node) override;
         virtual void    visit(SyntaxNodeUnary *node) override;
         virtual void    visit(SyntaxNodePrimary *node) override;
-        virtual void    visit(SyntaxNodeGrouping *node) override;
         
     protected:
         memory_buffer   buffer;

@@ -10,6 +10,8 @@ class SyntaxNodeVisitor
 
         virtual void    visit(SyntaxNodeRoot *node);
         virtual void    visit(SyntaxNodeBody *node);
+
+        virtual void    visit(SyntaxNodePrintStatement *node);
         virtual void    visit(SyntaxNodeExpressionStatement *node);
 
         virtual void    visit(SyntaxNodeExpression *node);
@@ -18,7 +20,6 @@ class SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeMagnitude *node);
         virtual void    visit(SyntaxNodeUnary *node);
         virtual void    visit(SyntaxNodePrimary *node);
-        virtual void    visit(SyntaxNodeGrouping *node);
 
     protected:
 

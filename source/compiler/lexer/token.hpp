@@ -55,7 +55,6 @@ class Token
         string      get_reference() const;
         string      get_source() const;
         TokenType   get_type() const;
-        string      get_type_string() const;
         i32         get_line() const;
         i32         get_column() const;
 
@@ -71,5 +70,7 @@ class Token
         i32         column;
 
 };
+
+string get_type_string(TokenType type);
 
 #endif

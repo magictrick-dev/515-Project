@@ -42,13 +42,27 @@ class SyntaxParser
     protected:
         template <typename T, typename ...Args> shared_ptr<T> create_node(Args... args);
 
+        TokenType get_previous_token_type() const;
+        TokenType get_current_token_type() const;
+        TokenType get_next_token_type() const;
+
+        bool is_previous_token_type(TokenType type) const;
+        bool is_current_token_type(TokenType type) const;
+        bool is_next_token_type(TokenType type) const;
+
+        void consume_current_token_as(TokenType type, u64 where);
+
+        void synchronize_to(TokenType type);
+
     protected:
         shared_ptr<SyntaxNode>      match_root();
         shared_ptr<SyntaxNode>      match_body();
-        shared_ptr<SyntaxNode>      match_statements();
-        
+
+        shared_ptr<SyntaxNode>      match_statements();   
+        shared_ptr<SyntaxNode>      match_print_statement();
+        shared_ptr<SyntaxNode>      match_read_statement();
         shared_ptr<SyntaxNode>      match_expression_statement();
-        
+    
         shared_ptr<SyntaxNode>      match_expression();
         shared_ptr<SyntaxNode>      match_term();
         shared_ptr<SyntaxNode>      match_factor();

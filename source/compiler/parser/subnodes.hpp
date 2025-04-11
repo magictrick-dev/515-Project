@@ -51,6 +51,26 @@ class SyntaxNodeBody : public SyntaxNode
 //
 // -----------------------------------------------------------------------------
 
+class SyntaxNodePrintStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodePrintStatement();
+        virtual        ~SyntaxNodePrintStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        std::vector<shared_ptr<SyntaxNode>> expressions;
+
+};
+
+// --- Expression Statement Syntax Node -----------------------------------------
+// 
+// Represents a single expression statement.
+//
+// -----------------------------------------------------------------------------
+
 class SyntaxNodeExpressionStatement : public SyntaxNode
 {
 
@@ -192,26 +212,6 @@ class SyntaxNodePrimary : public SyntaxNode
     public:
         PrimaryType primary_type;
         string value;
-
-};
-
-// --- Grouping Syntax Node ----------------------------------------------------
-// 
-// Represents a grouping of expressions.
-// 
-// -----------------------------------------------------------------------------
-
-class SyntaxNodeGrouping : public SyntaxNode
-{
-
-    public:
-                        SyntaxNodeGrouping();
-        virtual        ~SyntaxNodeGrouping();
-
-        virtual void    accept(SyntaxNodeVisitor *visitor) override;
-        
-    public:
-        shared_ptr<SyntaxNode> expression;
 
 };
 

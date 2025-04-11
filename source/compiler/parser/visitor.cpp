@@ -13,6 +13,12 @@ visit(SyntaxNodeBody *node)
 }
 
 void SyntaxNodeVisitor::
+visit(SyntaxNodePrintStatement *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
 visit(SyntaxNodeExpressionStatement *node)
 {
     return;
@@ -54,8 +60,3 @@ visit(SyntaxNodePrimary *node)
     return;
 }
 
-void SyntaxNodeVisitor::
-visit(SyntaxNodeGrouping *node)
-{
-    return;
-}

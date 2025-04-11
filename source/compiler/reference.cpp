@@ -83,13 +83,35 @@ visit(SyntaxNodeBody *node)
 }
 
 void ASTReferenceOutput::
+visit(SyntaxNodePrintStatement *node)
+{
+
+    this->print_tabs();
+    std::cout << "PRINT STATEMENT" << std::endl;
+
+    this->push_tabs();
+
+    for (auto expression : node->expressions)
+    {
+
+        expression->accept(this);
+
+    }
+
+    this->pop_tabs();
+
+}
+
+void ASTReferenceOutput::
 visit(SyntaxNodeExpressionStatement *node)
 {
     
     this->print_tabs();
     std::cout << "EXPRESSION STATEMENT ";
+    std::cout << evaluation_type_to_string(node->expression->evaluation_type) << std::endl;
+    this->push_tabs();
     node->expression->accept(this);
-    std::cout << std::endl;
+    this->pop_tabs();
     
 }
 
@@ -105,16 +127,23 @@ void ASTReferenceOutput::
 visit(SyntaxNodeTerm *node)
 {
     
-    node->left->accept(this);
     
+    this->print_tabs();
     switch (node->operation_type)
     {
-        case OperationType::OPERATION_TYPE_ADDITION: std::cout << " + "; break;
-        case OperationType::OPERATION_TYPE_SUBTRACTION: std::cout << " - "; break;
+        case OperationType::OPERATION_TYPE_ADDITION: std::cout << "ADDITION "; break;
+        case OperationType::OPERATION_TYPE_SUBTRACTION: std::cout << "SUBTRACTION "; break;
         default: NOREACH("Invalid operation type");
     }
-    
+
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
+
+    this->push_tabs();
+
+    node->left->accept(this);
     node->right->accept(this);
+
+    this->pop_tabs();
     
 }
 
@@ -122,17 +151,24 @@ void ASTReferenceOutput::
 visit(SyntaxNodeFactor *node)
 {
     
-    node->left->accept(this);
     
+    this->print_tabs();
     switch (node->operation_type)
     {
-        case OperationType::OPERATION_TYPE_MULTIPLICATION: std::cout << " * "; break;
-        case OperationType::OPERATION_TYPE_DIVISION: std::cout << " / "; break;
-        case OperationType::OPERATION_TYPE_MODULUS: std::cout << " % "; break;
+        case OperationType::OPERATION_TYPE_MULTIPLICATION: std::cout << "MULTIPLICATION "; break;
+        case OperationType::OPERATION_TYPE_DIVISION: std::cout << "DIVISION "; break;
+        case OperationType::OPERATION_TYPE_MODULUS: std::cout << "MODULUS "; break;
         default: NOREACH("Invalid operation type");
     }
+
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
     
+    this->push_tabs();
+
+    node->left->accept(this);
     node->right->accept(this);
+
+    this->pop_tabs();
     
 }
 
@@ -140,16 +176,23 @@ void ASTReferenceOutput::
 visit(SyntaxNodeMagnitude *node)
 {
     
-    node->left->accept(this);
     
+    this->print_tabs();
     switch (node->operation_type)
     {
-        case OperationType::OPERATION_TYPE_EXPONENT: std::cout << " ^ "; break;
+        case OperationType::OPERATION_TYPE_EXPONENT: std::cout << "EXPONENTIATION "; break;
         default: NOREACH("Invalid operation type");
     }
     
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
+
+    this->push_tabs();
+
+    node->left->accept(this);
     node->right->accept(this);
     
+    this->pop_tabs();
+
 }
 
 void ASTReferenceOutput::
@@ -157,14 +200,21 @@ visit(SyntaxNodeUnary *node)
 {
     
     
+    this->print_tabs();
     switch (node->operation_type)
     {
-        case OperationType::OPERATION_TYPE_NEGATION: std::cout << "-"; break;
-        case OperationType::OPERATION_TYPE_POSITIVE: std::cout << "+"; break;
+        case OperationType::OPERATION_TYPE_NEGATION: std::cout << "UNARY - "; break;
+        case OperationType::OPERATION_TYPE_POSITIVE: std::cout << "UNARY + "; break;
         default: NOREACH("Invalid operation type");
     }
+
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
+
+    this->push_tabs();
     
     node->right->accept(this);
+
+    this->pop_tabs();
     
 }
 
@@ -172,16 +222,8 @@ void ASTReferenceOutput::
 visit(SyntaxNodePrimary *node)
 {
     
-    std::cout << node->value;
+    this->print_tabs();
+    std::cout << "PRIMARY " << evaluation_type_to_string(node->evaluation_type) << " " << node->value << std::endl;
     
 }
 
-void ASTReferenceOutput::
-visit(SyntaxNodeGrouping *node)
-{
-    
-    std::cout << "(";
-    node->expression->accept(this);
-    std::cout << ")";
-    
-}
