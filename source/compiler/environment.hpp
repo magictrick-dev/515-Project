@@ -18,6 +18,7 @@ class Environment
         vptr        symbol_search(ccptr name);
 
     protected:
+        std::unordered_map<string, vptr> string_table;
         vptr        string_buffer_pointer;
         u64         string_buffer_size;
         u64         string_buffer_offset;

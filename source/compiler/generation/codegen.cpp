@@ -12,6 +12,8 @@ CodeGenerator(u64 buffer_size, Graph *graph, Environment *environment)
 {
     
     buffer = system_virtual_allocate(NULL, buffer_size, true);
+    this->graph = graph;
+    this->environment = environment;
     
 }
 
