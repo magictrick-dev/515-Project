@@ -100,9 +100,18 @@ visit(SyntaxNodePrintStatement *node)
 
                 expression->accept(this);
 
+#if defined(_WIN32)
+                // MOV RCX, RAX
+                // Windows ABI ????????????????
+                // ????????????????????????????
+                memory_buffer_write_u8(&this->buffer, 0x48);
+                memory_buffer_write_u8(&this->buffer, 0x89);
+                memory_buffer_write_u8(&this->buffer, 0xC1);  // C1 = ModR/M for RCX, RAX
+#else
                 memory_buffer_write_u8(&this->buffer, 0x48); // MOV RDI, RAX 
                 memory_buffer_write_u8(&this->buffer, 0x89);
                 memory_buffer_write_u8(&this->buffer, 0xC7);
+#endif
 
                 long int print_cast = (long int)print_string; // Dirty cast the pointer.
 
@@ -314,8 +323,63 @@ visit(SyntaxNodeMagnitude *node)
         case OperationType::OPERATION_TYPE_EXPONENT:
         {
             
-            // For this assignment, we won't be doing exponentiation. Return LHS.
+            // Preloads EAX with the LHS.
             node->left->accept(this);
+
+            // Push EAX.
+            memory_buffer_write_u8(&this->buffer,   0x50);
+
+            // Preloads EAX with the RHS.
+            node->right->accept(this);
+
+            // Now we do the magic.
+            memory_buffer_write_u8(&this->buffer,   0x41); // MOV R10, EAX
+            memory_buffer_write_u8(&this->buffer,   0x89);
+            memory_buffer_write_u8(&this->buffer,   0xC2);
+            memory_buffer_write_u8(&this->buffer,   0x41); // POP R9
+            memory_buffer_write_u8(&this->buffer,   0x8F);
+            memory_buffer_write_u8(&this->buffer,   0xC1);
+            memory_buffer_write_u8(&this->buffer,   0x45); // XOR R8, R8
+            memory_buffer_write_u8(&this->buffer,   0x31);
+            memory_buffer_write_u8(&this->buffer,   0xc0);
+            memory_buffer_write_u8(&this->buffer,   0x45); // TEST R10, R10
+            memory_buffer_write_u8(&this->buffer,   0x85);
+            memory_buffer_write_u8(&this->buffer,   0xd2);
+            memory_buffer_write_u8(&this->buffer,   0x7c); // JL 1EH
+            memory_buffer_write_u8(&this->buffer,   0x1e);
+            memory_buffer_write_u8(&this->buffer,   0x41); // INC R8
+            memory_buffer_write_u8(&this->buffer,   0xff);
+            memory_buffer_write_u8(&this->buffer,   0xc0);
+            memory_buffer_write_u8(&this->buffer,   0x45); // TEST R10, R10
+            memory_buffer_write_u8(&this->buffer,   0x85);
+            memory_buffer_write_u8(&this->buffer,   0xd2);
+            memory_buffer_write_u8(&this->buffer,   0x74); // JE 16H
+            memory_buffer_write_u8(&this->buffer,   0x16);
+            memory_buffer_write_u8(&this->buffer,   0x41); // TEST R10, 00000001H
+            memory_buffer_write_u8(&this->buffer,   0xf7);
+            memory_buffer_write_u8(&this->buffer,   0xc2);
+            memory_buffer_write_u8(&this->buffer,   0x01);
+            memory_buffer_write_u8(&this->buffer,   0x00);
+            memory_buffer_write_u8(&this->buffer,   0x00);
+            memory_buffer_write_u8(&this->buffer,   0x00);
+            memory_buffer_write_u8(&this->buffer,   0x74); // JE 04H
+            memory_buffer_write_u8(&this->buffer,   0x04);
+            memory_buffer_write_u8(&this->buffer,   0x45); // IMUL R8, R9
+            memory_buffer_write_u8(&this->buffer,   0x0f);
+            memory_buffer_write_u8(&this->buffer,   0xaf);
+            memory_buffer_write_u8(&this->buffer,   0xc1);
+            memory_buffer_write_u8(&this->buffer,   0x45); // IMUL R9, R9
+            memory_buffer_write_u8(&this->buffer,   0x0f);
+            memory_buffer_write_u8(&this->buffer,   0xaf);
+            memory_buffer_write_u8(&this->buffer,   0xc9);
+            memory_buffer_write_u8(&this->buffer,   0x41); // SAR R10, 1
+            memory_buffer_write_u8(&this->buffer,   0xd1);
+            memory_buffer_write_u8(&this->buffer,   0xfa);
+            memory_buffer_write_u8(&this->buffer,   0xeb); // JMP  -27H
+            memory_buffer_write_u8(&this->buffer,   0xe5);
+            memory_buffer_write_u8(&this->buffer,   0x44); // MOV EAX, R8
+            memory_buffer_write_u8(&this->buffer,   0x89);
+            memory_buffer_write_u8(&this->buffer,   0xc0);
 
         } break;
 

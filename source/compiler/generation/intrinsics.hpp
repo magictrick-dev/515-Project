@@ -5,21 +5,21 @@
 inline void print_int(int value)
 {
 
-    std::cout << value;
+    printf("%i", value);
 
 }
 
 inline void print_bool(int value)
 {
 
-    std::cout << value;
+    printf("%i", value);
 
 }
 
 inline void print_string(const char *value)
 {
 
-    std::cout << value;
+    printf("%s", value);
 
 }
 
