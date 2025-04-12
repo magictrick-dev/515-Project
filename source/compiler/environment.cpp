@@ -45,12 +45,13 @@ vptr Environment::
 string_insert(ccptr string)
 {
 
-    if (this->string_table.find(string) == this->string_table.end())
-    {
-        u64 string_length = strlen(string) + 1;
-    }
+    cptr result = this->string_buffer_pointer + this->string_buffer_offset;
 
-    return (vptr)string;
+    u64 string_length = strlen(string) + 1;
+    memcpy(result, string, string_length);
+
+    this->string_buffer_offset += ALIGNMENT(string_length, 8);
+    return result;
 
 }
 

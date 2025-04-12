@@ -4,8 +4,11 @@
 #include <compiler/generation/codegen.hpp>
 
 Compiler::
-Compiler() : parser(&this->environment, &this->graph), graph(), environment()
+Compiler() : parser(&this->environment, &this->graph)
 {
+
+    this->environment = {};
+    this->graph = {};
 
 }
 
