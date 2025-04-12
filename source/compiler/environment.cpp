@@ -5,26 +5,17 @@ Environment()
 {
 
     // String intern table.
-    this->string_buffer_size    = 1024*1024;
+    this->string_table = {};
+    this->string_buffer_size    = 1024*4;
     this->string_buffer_pointer = malloc(this->string_buffer_size);
     this->string_buffer_offset  = 0;
 
     // Symbol table.
-    this->symbol_buffer_size    = 1024*1024;
+    this->symbol_table = {};
+    this->symbol_buffer_size    = 1024*4;
     this->symbol_buffer_pointer = malloc(this->symbol_buffer_size);
     this->symbol_buffer_offset  = 0;
 
-    // Null-terminate the entire buffer.
-    for (u64 i = 0; i < this->string_buffer_size; ++i)
-    {
-        *((char*)this->string_buffer_pointer + i) = '\0';
-    }
-
-    // Zero out the memory.
-    for (u64 i = 0; i < this->symbol_buffer_size; ++i)
-    {
-        *((char*)this->symbol_buffer_pointer + i) = 0x00;
-    }
     
 }
 
@@ -54,26 +45,12 @@ vptr Environment::
 string_insert(ccptr string)
 {
 
-    // Prevent duplicates??
-    if (this->string_table.find(string) != this->string_table.end())
+    if (this->string_table.find(string) == this->string_table.end())
     {
-
-        return this->string_table[string];
-
+        u64 string_length = strlen(string) + 1;
     }
 
-    // Do some memory magic.
-    char* offset = (char*)this->string_buffer_pointer + this->string_buffer_offset;
-    u64 string_length = strlen(string) + 1;
-    for (u64 i = 0; i < string_length; ++i)
-    {
-        
-        offset[i] = string[i];
-
-    }
-
-    this->string_buffer_offset += string_length;
-    return (vptr)offset;
+    return (vptr)string;
 
 }
 

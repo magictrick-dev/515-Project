@@ -8,7 +8,7 @@
 //
 
 CodeGenerator::
-CodeGenerator(u64 buffer_size)
+CodeGenerator(u64 buffer_size, Graph *graph, Environment *environment)
 {
     
     buffer = system_virtual_allocate(NULL, buffer_size, true);
@@ -63,15 +63,15 @@ visit(SyntaxNodePrintStatement *node)
     for (auto expression : node->expressions)
     {
 
-        // Loads everything into EAX.
-        expression->accept(this);
-
         // Now generate.
         switch (expression->evaluation_type)
         {
 
             case EvaluationType::EVALUATION_TYPE_INT4:
             {
+
+                // Loads everything into EAX.
+                expression->accept(this);
 
                 memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
                 memory_buffer_write_u8(&this->buffer, 0xC7);
@@ -96,7 +96,10 @@ visit(SyntaxNodePrintStatement *node)
             case EvaluationType::EVALUATION_TYPE_STRING_LITERAL:
             {
 
-                memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
+                expression->accept(this);
+
+                memory_buffer_write_u8(&this->buffer, 0x48); // MOV RDI, RAX 
+                memory_buffer_write_u8(&this->buffer, 0x89);
                 memory_buffer_write_u8(&this->buffer, 0xC7);
 
                 long int print_cast = (long int)print_string; // Dirty cast the pointer.
@@ -376,6 +379,35 @@ visit(SyntaxNodePrimary *node)
             memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
             memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
             
+        } break;
+
+        case PrimaryType::PRIMARY_TYPE_STRING:
+        {
+    
+
+            string type_string = node->value;
+            type_string.erase(0,1);
+            type_string.pop_back();
+            cptr string_result = (cptr)this->environment->string_insert(type_string.c_str());
+            std::cout << type_string << std::endl;
+            std::cout << string_result << std::endl;
+
+            i64 value = (i64)string_result;
+
+            // MOVE RAX, value
+            memory_buffer_write_u8(&this->buffer,   0x48);
+            memory_buffer_write_u8(&this->buffer,   0xB8);
+
+            // IMM64
+            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 32) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 40) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 48) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 56) & 0xFF);
+
         } break;
         
         default:       

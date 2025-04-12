@@ -1,6 +1,8 @@
 #ifndef SOURCE_COMPILER_GENERATION_CODEGEN_HPP
 #define SOURCE_COMPILER_GENERATION_CODEGEN_HPP
 #include <compiler/parser/visitor.hpp>
+#include <compiler/environment.hpp>
+#include <compiler/graph.hpp>
 #include <utilities/buffer.hpp>
 #include <vector>
 
@@ -10,7 +12,7 @@ class CodeGenerator : public SyntaxNodeVisitor
 {
 
     public:
-                        CodeGenerator(u64 buffer_size);
+                        CodeGenerator(u64 buffer_size, Graph *graph, Environment *environment);
         virtual        ~CodeGenerator();
         
         int             operator()(); // functor fun time
@@ -30,6 +32,8 @@ class CodeGenerator : public SyntaxNodeVisitor
         
     protected:
         memory_buffer   buffer;
+        Environment    *environment;
+        Graph          *graph;
 
 };
 

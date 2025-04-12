@@ -285,16 +285,23 @@ match_print_statement()
         auto expression = this->match_expression();
         expressions.push_back(expression);
 
-        // Whoopsies, we have a comma without an expression!
-        if (this->is_current_token_type(TokenType::TOKEN_COMMA) &&
-            this->is_next_token_type(TokenType::TOKEN_RIGHT_PARENTHESES))
+        
+        if (this->is_current_token_type(TokenType::TOKEN_COMMA))
         {
 
-            throw CompilerSyntaxErrorException(__LINE__, 
-                this->source_name,
-                this->tokenizer.get_current_token().get_line(), 
-                this->tokenizer.get_current_token().get_column(), 
-                "Expression in print statement after comma.");
+            // Whoopsies, we have a comma without an expression!
+            if (this->is_next_token_type(TokenType::TOKEN_RIGHT_PARENTHESES))
+            {
+
+                throw CompilerSyntaxErrorException(__LINE__, 
+                    this->source_name,
+                    this->tokenizer.get_current_token().get_line(), 
+                    this->tokenizer.get_current_token().get_column(), 
+                    "Expression in print statement after comma.");
+
+            }
+
+            this->consume_current_token_as(TokenType::TOKEN_COMMA, __LINE__);
 
         }
 
@@ -610,7 +617,7 @@ match_primary()
                 primary_type = PrimaryType::PRIMARY_TYPE_STRING;
                 evaluation_type = EvaluationType::EVALUATION_TYPE_STRING_LITERAL;
 
-            }
+            } break;
 
             default: NOREACH("We should never reach this point."); break;
         }

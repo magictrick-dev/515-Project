@@ -4,8 +4,7 @@
 #include <compiler/generation/codegen.hpp>
 
 Compiler::
-Compiler()
-    : parser(&this->environment, &this->graph)
+Compiler() : parser(&this->environment, &this->graph), graph(), environment()
 {
 
 }
@@ -31,7 +30,7 @@ compile(string source, bool dump_reference)
 
     }
     
-    CodeGenerator generator(4*1024*1024);
+    CodeGenerator generator(4*1024*1024, &this->graph, &this->environment);
     this->parser.accept(&generator);
     generator();
 
