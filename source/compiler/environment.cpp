@@ -5,14 +5,12 @@ Environment()
 {
 
     // String intern table.
-    this->string_table = {};
-    this->string_buffer_size    = 1024*4;
+    this->string_buffer_size    = 1024*1024;
     this->string_buffer_pointer = malloc(this->string_buffer_size);
     this->string_buffer_offset  = 0;
 
     // Symbol table.
-    this->symbol_table = {};
-    this->symbol_buffer_size    = 1024*4;
+    this->symbol_buffer_size    = 1024*1024;
     this->symbol_buffer_pointer = malloc(this->symbol_buffer_size);
     this->symbol_buffer_offset  = 0;
 
@@ -22,35 +20,25 @@ Environment()
 Environment::
 ~Environment()
 {
-
-    if (this->symbol_buffer_pointer != NULL)
-    {
-
-        free(this->symbol_buffer_pointer);
-        this->symbol_buffer_pointer = NULL;
-
-    }
-
-    if (this->string_buffer_pointer != NULL)
-    {
-
-        free(this->string_buffer_pointer);
-        this->string_buffer_pointer = NULL;
-
-    }
-    
+  
 }
 
 vptr Environment::
-string_insert(ccptr string)
+string_insert(string string)
 {
 
     if (this->string_table.find(string) == this->string_table.end())
     {
 
         cptr result = (char*)this->string_buffer_pointer + this->string_buffer_offset;
-        u64 string_length = strlen(string) + 1;
-        memcpy(result, string, string_length);
+        u64 string_length = strlen(string.c_str()) + 1;
+        for (u64 i = 0; i < string_length; ++i)
+        {
+
+            result[i] = string[i];
+
+        }
+
         this->string_buffer_offset += string_length;
         this->string_table[string] = result;
 

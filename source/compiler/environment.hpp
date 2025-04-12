@@ -11,7 +11,7 @@ class Environment
                     Environment();
         virtual    ~Environment();
 
-        vptr        string_insert(ccptr string);
+        vptr        string_insert(string string);
 
         bool        symbol_exists(ccptr name);
         vptr        symbol_insert(ccptr name);

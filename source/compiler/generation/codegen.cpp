@@ -391,8 +391,6 @@ visit(SyntaxNodePrimary *node)
             type_string.erase(0,1);
             type_string.pop_back();
             cptr string_result = (cptr)this->environment->string_insert(type_string.c_str());
-            std::cout << type_string << std::endl;
-            std::cout << string_result << std::endl;
 
             i64 value = (i64)string_result;
 
