@@ -1,5 +1,41 @@
 #include <iostream>
+#include <string>
 #include <compiler/reference.hpp>
+
+static inline string 
+escape_string(const string& input) {
+    std::string result;
+    result.reserve(input.size());
+
+    for (char c : input) {
+        switch (c) {
+            case '\n': result += "\\n";     break;
+            case '\t': result += "\\t";     break;
+            case '\r': result += "\\r";     break;
+            case '\b': result += "\\b";     break;
+            case '\f': result += "\\f";     break;
+            case '\v': result += "\\v";     break;
+            case '\a': result += "\\a";     break;
+            case '\\': result += "\\\\";    break;
+            case '\0': result += "\\0";     break;
+
+            default:
+                if (std::isprint(static_cast<unsigned char>(c))) {
+                    result += c;
+                } else {
+                    // Optional: handle non-printable characters as hex
+                    char buf[5];
+                    snprintf(buf, sizeof(buf), "\\x%02X", static_cast<unsigned char>(c));
+                    result += buf;
+
+                }
+                break;
+        }
+    }
+
+    return result;
+
+}
 
 ASTReferenceOutput::
 ASTReferenceOutput(int tab_size)
@@ -223,7 +259,7 @@ visit(SyntaxNodePrimary *node)
 {
     
     this->print_tabs();
-    std::cout << "PRIMARY " << evaluation_type_to_string(node->evaluation_type) << " " << node->value << std::endl;
+    std::cout << "PRIMARY " << evaluation_type_to_string(node->evaluation_type) << " " << escape_string(node->value) << std::endl;
     
 }
 

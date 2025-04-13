@@ -100,18 +100,9 @@ visit(SyntaxNodePrintStatement *node)
 
                 expression->accept(this);
 
-#if defined(_WIN32)
-                // MOV RCX, RAX
-                // Windows ABI ????????????????
-                // ????????????????????????????
-                memory_buffer_write_u8(&this->buffer, 0x48);
-                memory_buffer_write_u8(&this->buffer, 0x89);
-                memory_buffer_write_u8(&this->buffer, 0xC1);  // C1 = ModR/M for RCX, RAX
-#else
                 memory_buffer_write_u8(&this->buffer, 0x48); // MOV RDI, RAX 
                 memory_buffer_write_u8(&this->buffer, 0x89);
                 memory_buffer_write_u8(&this->buffer, 0xC7);
-#endif
 
                 long int print_cast = (long int)print_string; // Dirty cast the pointer.
 

@@ -34,6 +34,7 @@ Token::
 string Token::
 get_reference() const
 {
+    std::cout << "REFERENCE: " << this->reference << std::endl;
     return this->reference;
 }
 

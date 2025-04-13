@@ -501,7 +501,7 @@ match_magnitude()
         this->tokenizer.shift();
         
         // Get the right term.
-        auto right = this->match_unary();
+        auto right = this->match_magnitude();
         
         if (left->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL ||
             right->evaluation_type == EvaluationType::EVALUATION_TYPE_STRING_LITERAL)
@@ -588,6 +588,8 @@ match_primary()
         
         Token token = this->tokenizer.get_current_token();
         this->tokenizer.shift();
+
+        string value;
         
         PrimaryType primary_type = PrimaryType::PRIMARY_TYPE_NULL;
         EvaluationType evaluation_type = EvaluationType::EVALUATION_TYPE_NULL;
@@ -599,6 +601,7 @@ match_primary()
 
                 primary_type = PrimaryType::PRIMARY_TYPE_INTEGER;
                 evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
+                value = token.get_reference();
 
 
             } break;
@@ -608,6 +611,7 @@ match_primary()
 
                 primary_type = PrimaryType::PRIMARY_TYPE_FLOAT;
                 evaluation_type = EvaluationType::EVALUATION_TYPE_FLOAT;
+                value = token.get_reference();
 
             } break;
 
@@ -616,6 +620,7 @@ match_primary()
 
                 primary_type = PrimaryType::PRIMARY_TYPE_STRING;
                 evaluation_type = EvaluationType::EVALUATION_TYPE_STRING_LITERAL;
+                value = token.parse_reference_as_string();
 
             } break;
 
@@ -623,7 +628,7 @@ match_primary()
         }
 
         auto node = this->create_node<SyntaxNodePrimary>();
-        node->value             = token.get_reference();
+        node->value             = value;
         node->primary_type      = primary_type;
         node->evaluation_type   = evaluation_type;
         return node;
