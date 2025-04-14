@@ -17,6 +17,9 @@ class Environment
         vptr        symbol_insert(ccptr name);
         vptr        symbol_search(ccptr name);
 
+        u64         string_table_commit() const;
+        u64         symbol_table_commit() const;
+
     protected:
         std::unordered_map<string, vptr> string_table;
         vptr        string_buffer_pointer;

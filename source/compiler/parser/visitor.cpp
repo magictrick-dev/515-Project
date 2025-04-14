@@ -13,10 +13,30 @@ visit(SyntaxNodeBody *node)
 }
 
 void SyntaxNodeVisitor::
+visit(SyntaxNodeVariableStatement *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
+visit(SyntaxNodeReadStatement *node)
+{
+    return;
+}
+
+
+void SyntaxNodeVisitor::
 visit(SyntaxNodePrintStatement *node)
 {
     return;
 }
+
+void SyntaxNodeVisitor::
+visit(SyntaxNodeAssignmentStatement *node)
+{
+    return;
+}
+
 
 void SyntaxNodeVisitor::
 visit(SyntaxNodeExpressionStatement *node)

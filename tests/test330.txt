@@ -1,0 +1,6 @@
+# variable declaration
+
+int4 a;
+int4 b;
+int4 c;
+

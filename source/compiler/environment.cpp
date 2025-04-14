@@ -23,6 +23,22 @@ Environment::
   
 }
 
+u64 Environment::        
+string_table_commit() const
+{
+
+    return this->string_buffer_offset;
+
+}
+
+u64 Environment::        
+symbol_table_commit() const
+{
+
+    return this->symbol_buffer_offset;
+
+}
+
 vptr Environment::
 string_insert(string string)
 {

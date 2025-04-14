@@ -131,7 +131,7 @@ consume_current_token_as(TokenType type, u64 where)
             this->tokenizer.get_current_token().get_column(), 
             "Unexpected token found in statement: %s, expecting %s.",
             this->tokenizer.get_current_token().get_reference().c_str(),
-            get_type_string(type));
+            get_type_string(type).c_str());
     }
 
     this->tokenizer.shift();
@@ -149,6 +149,8 @@ synchronize_to(TokenType type)
         this->tokenizer.shift();
 
     }
+
+    this->tokenizer.shift();
 
 }
 
@@ -184,8 +186,8 @@ match_body()
         catch (CompilerException &exception)
         {
             
-            // TODO(Chris): Synchronize and output error.
             std::cout << exception.what() << std::endl;
+            this->synchronize_to(TokenType::TOKEN_SEMICOLON);
             continue;
             
         }
@@ -210,6 +212,26 @@ match_statements()
 
             Token current_token = this->tokenizer.get_current_token();
 
+            if (this->is_next_token_type(TokenType::TOKEN_ASSIGN))
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> assignment_statement = this->match_assignment_statement();
+                    return assignment_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    throw;
+
+                }
+
+            }
+
             if (current_token.get_reference() == "print")
             {
 
@@ -224,7 +246,47 @@ match_statements()
                 catch (CompilerException &exception)
                 {
 
-                    this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+                    throw;
+
+                }
+
+            }
+
+            else if (current_token.get_reference() == "read")
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> read_statement = this->match_read_statement();
+                    return read_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    throw;
+
+                }
+
+            }
+
+            else if (current_token.get_reference() == "int4")
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> variable_statement = this->match_variable_statement();
+                    return variable_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    throw;
 
                 }
 
@@ -246,7 +308,6 @@ match_statements()
             catch (CompilerException &exception)
             {
                 
-                // TODO(Chris): Synchronize.
                 throw;
                 
             }
@@ -266,6 +327,72 @@ match_statements()
     NOREACH("We should never reach this point or return nullptr.");
     return nullptr;
     
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_variable_statement()
+{
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+
+    Token current_token = this->tokenizer.get_current_token(); // Variable name?
+    string identifier = current_token.get_reference();
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+
+    if (this->environment->symbol_exists(identifier.c_str()))
+    {
+
+        throw CompilerSyntaxErrorException(__LINE__, 
+            this->source_name,
+            current_token.get_line(), 
+            current_token.get_column(), 
+            "Attempting to initialize a variable that already exists: %s",
+            current_token.get_reference().c_str());
+
+    }
+
+    this->consume_current_token_as(TokenType::TOKEN_SEMICOLON, __LINE__);
+
+    vptr offset = this->environment->symbol_insert(identifier.c_str());
+
+    auto variable_node = this->create_node<SyntaxNodeVariableStatement>();
+    variable_node->variable_name = identifier;
+    variable_node->address = offset;
+
+    return variable_node;
+
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_read_statement()
+{
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_LEFT_PARENTHESES, __LINE__);
+
+    Token identifier = this->tokenizer.get_current_token();
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_RIGHT_PARENTHESES, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_SEMICOLON, __LINE__);
+
+    if (!this->environment->symbol_exists(identifier.get_reference().c_str()))
+    {
+
+        throw CompilerSyntaxErrorException(__LINE__, 
+            this->source_name,
+            identifier.get_line(), 
+            identifier.get_column(), 
+            "Undeclared identifier %s used in print statement.",
+            identifier.get_reference().c_str());
+
+    }
+
+    auto read_statement = this->create_node<SyntaxNodeReadStatement>();
+    read_statement->variable_name = identifier.get_reference();
+    return read_statement;
+
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
@@ -305,6 +432,13 @@ match_print_statement()
 
         }
 
+        else
+        {
+
+            break;
+
+        }
+
     }
 
     this->consume_current_token_as(TokenType::TOKEN_RIGHT_PARENTHESES, __LINE__);
@@ -329,11 +463,36 @@ match_print_statement()
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
-match_read_statement()
+match_assignment_statement()
 {
+    
+    Token current_token = this->tokenizer.get_current_token();
 
-    NOREACH("We should never reach this point or return nullptr.");
-    return nullptr;
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_ASSIGN, __LINE__);
+
+    auto expression = this->match_expression();
+
+    this->consume_current_token_as(TokenType::TOKEN_SEMICOLON, __LINE__);
+
+    string identifier = current_token.get_reference();
+
+    if (!this->environment->symbol_exists(identifier.c_str()))
+    {
+
+        throw CompilerSyntaxErrorException(__LINE__, 
+            this->source_name,
+            current_token.get_line(), 
+            current_token.get_column(), 
+            "Undefined variable %s used in assignment.",
+            identifier.c_str());
+
+    }
+
+    auto assignment_node = this->create_node<SyntaxNodeAssignmentStatement>();
+    assignment_node->expression = expression;
+    assignment_node->variable_name = identifier;
+    return assignment_node;
 
 }
 
@@ -583,7 +742,8 @@ match_primary()
     
     if (this->tokenizer.current_token_is(TokenType::TOKEN_INTEGER) ||
         this->tokenizer.current_token_is(TokenType::TOKEN_REAL) ||
-        this->tokenizer.current_token_is(TokenType::TOKEN_STRING))
+        this->tokenizer.current_token_is(TokenType::TOKEN_STRING) ||
+        this->tokenizer.current_token_is(TokenType::TOKEN_IDENTIFIER))
     {
         
         Token token = this->tokenizer.get_current_token();
@@ -621,6 +781,28 @@ match_primary()
                 primary_type = PrimaryType::PRIMARY_TYPE_STRING;
                 evaluation_type = EvaluationType::EVALUATION_TYPE_STRING_LITERAL;
                 value = token.parse_reference_as_string();
+
+            } break;
+
+            case TokenType::TOKEN_IDENTIFIER:
+            {
+
+                if (!this->environment->symbol_exists(token.get_reference().c_str()))
+                {
+
+                    throw CompilerSyntaxErrorException(__LINE__, 
+                        this->source_name,
+                        token.get_line(), 
+                        token.get_column(), 
+                        "Undeclared identifier used in expression: %s",
+                        token.get_reference().c_str());
+
+
+                }
+
+                primary_type = PrimaryType::PRIMARY_TYPE_IDENTIFIER;
+                evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
+                value = token.get_reference();
 
             } break;
 

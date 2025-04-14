@@ -43,6 +43,10 @@ visit(SyntaxNodeRoot *node)
     node->base_node->accept(this);
     memory_buffer_write_u8(&this->buffer, 0xC3);
 
+    std::cout << "CODE GENERATION SIZE " << this->buffer.position << std::endl;
+    std::cout << "VARIABLE STORAGE TABLE SIZE: " << this->environment->symbol_table_commit() << std::endl;
+    std::cout << "STRING INTERN TABLE SIZE: " << this->environment->string_table_commit() << std::endl;
+
 }
 
 void CodeGenerator::
@@ -55,6 +59,76 @@ visit(SyntaxNodeBody *node)
         statement->accept(this);
         
     }
+
+}
+
+void CodeGenerator::
+visit(SyntaxNodeVariableStatement *node)
+{
+
+    i64 address = (i64)node->address;
+
+    // XOR EAX, EAX
+    memory_buffer_write_u8(&this->buffer, 0x31);
+    memory_buffer_write_u8(&this->buffer, 0xC0);
+
+    // MOV RDI, imm64
+    memory_buffer_write_u8(&this->buffer, 0x48);
+    memory_buffer_write_u8(&this->buffer, 0xBF);
+    memory_buffer_write_u8(&this->buffer, (address >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 24) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 32) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 40) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 48) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 56) & 0xFF);
+
+    // MOV [RDI], RAX
+    memory_buffer_write_u8(&this->buffer, 0x48);
+    memory_buffer_write_u8(&this->buffer, 0x89);
+    memory_buffer_write_u8(&this->buffer, 0x07);
+
+}
+
+void CodeGenerator::
+visit(SyntaxNodeReadStatement *node)
+{
+
+
+    int64_t cast = (int64_t)read_int; // Dirty cast the pointer.
+
+    memory_buffer_write_u8(&this->buffer, 0x48); // MOV RSI, [print_int]
+    memory_buffer_write_u8(&this->buffer, 0xBE);
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+    memory_buffer_write_u8(&this->buffer, cast & 0xff); cast >>= 8;
+
+    memory_buffer_write_u8(&this->buffer, 0xFF); // CALL RSI
+    memory_buffer_write_u8(&this->buffer, 0xD6);
+
+    // Results should be in EAX.
+    int64_t address = (int64_t)this->environment->symbol_search(node->variable_name.c_str());
+    ENSURE(address != 0);
+
+    memory_buffer_write_u8(&this->buffer, 0x48); // MOV RDI, IMM ADDRESS
+    memory_buffer_write_u8(&this->buffer, 0xBF);
+    memory_buffer_write_u8(&this->buffer, (address >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 24) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 32) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 40) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 48) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 56) & 0xFF);
+
+    memory_buffer_write_u8(&this->buffer, 0x89); // MOV [RDI], EAX
+    memory_buffer_write_u8(&this->buffer, 0x07);
 
 }
 
@@ -80,7 +154,7 @@ visit(SyntaxNodePrintStatement *node)
 
                 int64_t print_cast = (int64_t)print_int; // Dirty cast the pointer.
 
-                memory_buffer_write_u8(&this->buffer, 0x48); // MOV ESI, [print_int]
+                memory_buffer_write_u8(&this->buffer, 0x48); // MOV RSI, [print_int]
                 memory_buffer_write_u8(&this->buffer, 0xBE);
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
@@ -90,7 +164,8 @@ visit(SyntaxNodePrintStatement *node)
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
-                memory_buffer_write_u8(&this->buffer, 0xFF);
+
+                memory_buffer_write_u8(&this->buffer, 0xFF); // CALL RSI
                 memory_buffer_write_u8(&this->buffer, 0xD6);
 
             } break;
@@ -116,7 +191,8 @@ visit(SyntaxNodePrintStatement *node)
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
                 memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
-                memory_buffer_write_u8(&this->buffer, 0xFF);
+                
+                memory_buffer_write_u8(&this->buffer, 0xFF); // CALL RSI
                 memory_buffer_write_u8(&this->buffer, 0xD6);
 
             } break;
@@ -137,19 +213,40 @@ visit(SyntaxNodePrintStatement *node)
 }
 
 void CodeGenerator::
+visit(SyntaxNodeAssignmentStatement *node)
+{
+    
+    // This will automatically load the expression result into EAX.
+    node->expression->accept(this);
+
+    // Get the address of the variable.
+    int64_t address = (int64_t)this->environment->symbol_search(node->variable_name.c_str());
+    ENSURE(address != 0);
+
+    // Perform the move.
+    memory_buffer_write_u8(&this->buffer, 0x48); // MOV RDI, IMM ADDRESS
+    memory_buffer_write_u8(&this->buffer, 0xBF);
+    memory_buffer_write_u8(&this->buffer, (address >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 24) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 32) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 40) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 48) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (address >> 56) & 0xFF);
+
+    memory_buffer_write_u8(&this->buffer, 0x89); // MOV [RDI], EAX
+    memory_buffer_write_u8(&this->buffer, 0x07);
+
+
+
+}
+
+void CodeGenerator::
 visit(SyntaxNodeExpressionStatement *node)
 {
     
-    memory_buffer_reset_position(&this->buffer);
-
     node->expression->accept(this);
-
-    /*
-    int result = this->operator()();
-    std::cout << "Executing" << std::endl;
-    std::cout << "    Code Size:  " << this->buffer.position << " bytes" << std::endl;
-    std::cout << "    Result:     " << result << std::endl;
-    */
 
 }
 
@@ -462,6 +559,32 @@ visit(SyntaxNodePrimary *node)
             memory_buffer_write_u8(&this->buffer,   (value >> 40) & 0xFF);
             memory_buffer_write_u8(&this->buffer,   (value >> 48) & 0xFF);
             memory_buffer_write_u8(&this->buffer,   (value >> 56) & 0xFF);
+
+        } break;
+
+        case PrimaryType::PRIMARY_TYPE_IDENTIFIER:
+        {
+
+            string identifier = node->value;
+            i64 address = (i64)this->environment->symbol_search(identifier.c_str());
+            ENSURE(address != 0);
+
+            // MOV RDI, IMM
+            memory_buffer_write_u8(&this->buffer, 0x48);
+            memory_buffer_write_u8(&this->buffer, 0xBF);
+            memory_buffer_write_u8(&this->buffer, (address >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 24) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 32) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 40) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 48) & 0xFF);
+            memory_buffer_write_u8(&this->buffer, (address >> 56) & 0xFF);
+
+            // MOV RAX, [RDI]
+            memory_buffer_write_u8(&this->buffer, 0x48);
+            memory_buffer_write_u8(&this->buffer, 0x8B);
+            memory_buffer_write_u8(&this->buffer, 0x07);
 
         } break;
         

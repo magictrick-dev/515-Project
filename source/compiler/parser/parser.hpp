@@ -59,8 +59,10 @@ class SyntaxParser
         shared_ptr<SyntaxNode>      match_body();
 
         shared_ptr<SyntaxNode>      match_statements();   
+        shared_ptr<SyntaxNode>      match_variable_statement();
         shared_ptr<SyntaxNode>      match_print_statement();
         shared_ptr<SyntaxNode>      match_read_statement();
+        shared_ptr<SyntaxNode>      match_assignment_statement();
         shared_ptr<SyntaxNode>      match_expression_statement();
     
         shared_ptr<SyntaxNode>      match_expression();

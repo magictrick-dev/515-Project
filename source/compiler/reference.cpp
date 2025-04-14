@@ -119,6 +119,25 @@ visit(SyntaxNodeBody *node)
 }
 
 void ASTReferenceOutput::
+visit(SyntaxNodeVariableStatement *node)
+{
+
+    this->print_tabs();
+    std::cout << "VARIABLE STATEMENT " << node->variable_name << std::endl;
+
+}
+
+void ASTReferenceOutput::
+visit(SyntaxNodeReadStatement *node)
+{
+
+    this->print_tabs();
+    std::cout << "READ STATEMENT " << node->variable_name << std::endl;
+
+
+}
+
+void ASTReferenceOutput::
 visit(SyntaxNodePrintStatement *node)
 {
 
@@ -136,6 +155,18 @@ visit(SyntaxNodePrintStatement *node)
 
     this->pop_tabs();
 
+}
+
+void ASTReferenceOutput::
+visit(SyntaxNodeAssignmentStatement *node)
+{
+    
+    this->print_tabs();
+    std::cout << "ASSIGNMENT STATEMENT " << node->variable_name << " ";
+    this->push_tabs();
+    node->expression->accept(this);
+    this->pop_tabs();
+    
 }
 
 void ASTReferenceOutput::

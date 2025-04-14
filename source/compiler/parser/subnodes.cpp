@@ -46,6 +46,53 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- Variable Statement Syntax Node ------------------------------------------
+
+SyntaxNodeVariableStatement::
+SyntaxNodeVariableStatement()
+{
+
+    this->node_type         = SyntaxNodeType::SYNTAX_NODE_TYPE_VARIABLE_STATEMENT;
+    this->variable_name     = "";
+    this->address           = NULL;
+
+}
+
+SyntaxNodeVariableStatement::
+~SyntaxNodeVariableStatement()
+{
+    
+}
+
+void SyntaxNodeVariableStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+// --- Read Statement Syntax Node ---------------------------------------------
+
+SyntaxNodeReadStatement::
+SyntaxNodeReadStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_READ_STATEMENT;
+
+}
+
+SyntaxNodeReadStatement::
+~SyntaxNodeReadStatement()
+{
+    
+}
+
+void SyntaxNodeReadStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+
 // --- Print Statement Syntax Node ---------------------------------------------
 
 SyntaxNodePrintStatement::
@@ -68,6 +115,28 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- Assignment Statement Syntax Node -----------------------------------------
+
+SyntaxNodeAssignmentStatement::
+SyntaxNodeAssignmentStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_ASSIGNMENT_STATEMENT;
+    this->expression = nullptr;
+
+}
+
+SyntaxNodeAssignmentStatement::
+~SyntaxNodeAssignmentStatement()
+{
+    
+}
+
+void SyntaxNodeAssignmentStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
 
 // --- Expression Statement Syntax Node -----------------------------------------
 

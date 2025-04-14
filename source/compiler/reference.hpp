@@ -12,7 +12,10 @@ class ASTReferenceOutput : public SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeRoot *node) override;
         virtual void    visit(SyntaxNodeBody *node) override;
         
+        virtual void    visit(SyntaxNodeVariableStatement *node) override;
+        virtual void    visit(SyntaxNodeReadStatement *node) override;
         virtual void    visit(SyntaxNodePrintStatement *node) override;
+        virtual void    visit(SyntaxNodeAssignmentStatement *node) override;
         virtual void    visit(SyntaxNodeExpressionStatement *node) override;
         
         virtual void    visit(SyntaxNodeExpression *node) override;

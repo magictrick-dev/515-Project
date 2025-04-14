@@ -45,9 +45,50 @@ class SyntaxNodeBody : public SyntaxNode
 
 };
 
+// --- Variable Statement Syntax Node ------------------------------------------
+// 
+// Represents a variable statement.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeVariableStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeVariableStatement();
+        virtual        ~SyntaxNodeVariableStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        string variable_name;
+        vptr address;
+
+};
+
 // --- Expression Statement Syntax Node -----------------------------------------
 // 
-// Represents a single expression statement.
+// Represents a print statement.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeReadStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeReadStatement();
+        virtual        ~SyntaxNodeReadStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        string variable_name; // Where?
+
+};
+
+// --- Expression Statement Syntax Node -----------------------------------------
+// 
+// Represents a print statement.
 //
 // -----------------------------------------------------------------------------
 
@@ -62,6 +103,27 @@ class SyntaxNodePrintStatement : public SyntaxNode
         
     public:
         std::vector<shared_ptr<SyntaxNode>> expressions;
+
+};
+
+// --- Assignment Statement Syntax Node -----------------------------------------
+// 
+// Represents a single expression statement.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeAssignmentStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeAssignmentStatement();
+        virtual        ~SyntaxNodeAssignmentStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        string variable_name;
+        shared_ptr<SyntaxNode> expression;
 
 };
 
