@@ -3,19 +3,6 @@
 // Developed by Chris DeJong, January - May 2025. 
 // CSCI-490-D1 / CSCI-515 Principles of Compilers
 //
-// --- Language Grammar --------------------------------------------------------
-// 
-// The following language grammar describes the AST structure of the language.
-// 
-//      root            : body
-//      body            : (statement)*
-//      statement       : expression
-//      expression      : term ("+" | "-" term)*
-//      term            : factor ("*" | "/" | "mod" factor)*
-//      factor          : magnitude ("^" magnitude)*
-//      magnitude       : unary
-//      unary           : ("+" | "-") unary | primary
-//      primary         : number | string | identifier | "(" expression ")"
 //
 // -----------------------------------------------------------------------------
 
@@ -64,8 +51,14 @@ class SyntaxParser
         shared_ptr<SyntaxNode>      match_read_statement();
         shared_ptr<SyntaxNode>      match_assignment_statement();
         shared_ptr<SyntaxNode>      match_expression_statement();
+        shared_ptr<SyntaxNode>      match_conditional_statement();
+        shared_ptr<SyntaxNode>      match_while_statement();
     
         shared_ptr<SyntaxNode>      match_expression();
+        shared_ptr<SyntaxNode>      match_logical_or();
+        shared_ptr<SyntaxNode>      match_logical_and();
+        shared_ptr<SyntaxNode>      match_logical_not();
+        shared_ptr<SyntaxNode>      match_relational();
         shared_ptr<SyntaxNode>      match_term();
         shared_ptr<SyntaxNode>      match_factor();
         shared_ptr<SyntaxNode>      match_magnitude();

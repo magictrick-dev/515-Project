@@ -523,6 +523,34 @@ match_expression()
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
+match_logical_or()
+{
+
+    return nullptr;
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_logical_and()
+{
+
+    return nullptr;
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_logical_not()
+{
+
+    return nullptr;
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_relational()
+{
+
+    return nullptr;
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
 match_term()
 {
     
