@@ -18,6 +18,8 @@ class SyntaxNodeVisitor
         virtual void    visit(SyntaxNodeExpressionStatement *node);
 
         virtual void    visit(SyntaxNodeExpression *node);
+        virtual void    visit(SyntaxNodeLogical *node);
+        virtual void    visit(SyntaxNodeRelational *node);
         virtual void    visit(SyntaxNodeTerm *node);
         virtual void    visit(SyntaxNodeFactor *node);
         virtual void    visit(SyntaxNodeMagnitude *node);

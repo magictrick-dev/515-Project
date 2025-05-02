@@ -19,12 +19,12 @@ Compiler::
 }
 
 bool Compiler::
-compile(string source, bool dump_reference)
+compile(string source, bool no_reference, bool no_generate, bool no_execute)
 {
 
     bool result = this->parser.parse(source);
     
-    if (dump_reference == true)
+    if (!no_reference)
     {
         
         std::cout << "-- Displaying tree output." << std::endl;
@@ -32,10 +32,26 @@ compile(string source, bool dump_reference)
         this->parser.accept(&output);
 
     }
+    else
+    {
+        std::cout << "-- Reference output is disabled." << std::endl;
+    }
     
-    CodeGenerator generator(4*1024*1024, &this->graph, &this->environment);
-    this->parser.accept(&generator);
-    generator();
+    if (!no_generate)
+    {
+        CodeGenerator generator(4*1024*1024, &this->graph, &this->environment);
+        this->parser.accept(&generator);
+        if (!no_execute) generator();
+        else
+        {
+            std::cout << "-- Code execution is disabled." << std::endl;
+
+        }
+    }
+    else
+    {
+        std::cout << "-- Code generation is disabled." << std::endl;
+    }
 
     std::cout << "\n-- Runtime complete. (Newline is automatically added.)" << std::endl;
 

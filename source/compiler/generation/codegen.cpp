@@ -170,6 +170,33 @@ visit(SyntaxNodePrintStatement *node)
 
             } break;
 
+            case EvaluationType::EVALUATION_TYPE_BOOLEAN:
+            {
+
+                // Loads everything into EAX.
+                expression->accept(this);
+
+                memory_buffer_write_u8(&this->buffer, 0x89); // MOV EDI, EAX
+                memory_buffer_write_u8(&this->buffer, 0xC7);
+
+                int64_t print_cast = (int64_t)print_bool; // Dirty cast the pointer.
+
+                memory_buffer_write_u8(&this->buffer, 0x48); // MOV RSI, [print_int]
+                memory_buffer_write_u8(&this->buffer, 0xBE);
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+                memory_buffer_write_u8(&this->buffer, print_cast & 0xff); print_cast >>= 8;
+
+                memory_buffer_write_u8(&this->buffer, 0xFF); // CALL RSI
+                memory_buffer_write_u8(&this->buffer, 0xD6);
+
+            } break;
+
             case EvaluationType::EVALUATION_TYPE_STRING_LITERAL:
             {
 
@@ -255,6 +282,154 @@ visit(SyntaxNodeExpression *node)
 {
 
     node->expression->accept(this);
+
+}
+
+void CodeGenerator::
+visit(SyntaxNodeLogical *node)
+{
+
+    switch (node->operation_type)
+    {
+
+        case OperationType::OPERATION_TYPE_LOGICAL_OR:
+        {
+
+            // Places result into AL (not EAX).
+            node->left->accept(this);
+
+            // TST AL, 0x01.
+            memory_buffer_write_u8(&this->buffer, 0xA8);
+            memory_buffer_write_u8(&this->buffer, 0x01);
+
+            u64 current_offset = this->buffer.position; // Store current offset.
+                                                        
+            // JNZ (32-bit) over right.
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x85);
+
+            u64 jump_offset = this->buffer.position;
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+
+            // Places result into AL.
+            node->right->accept(this);
+
+            u64 ending_offset = this->buffer.position; // Ending offset.
+            i32 value = (ending_offset - current_offset);
+            this->buffer.position = jump_offset;
+            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
+
+            this->buffer.position = ending_offset; // Restore our position.
+
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_LOGICAL_AND:
+        {
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_LOGICAL_NOT:
+        {
+
+        } break;
+
+    }
+
+}
+
+void CodeGenerator::
+visit(SyntaxNodeRelational *node)
+{
+
+    // Loads the left side into EAX.
+    node->left->accept(this);
+    
+    // Push left from EAX.
+    memory_buffer_write_u8(&this->buffer,  0x50);
+    
+    // This loads the right side into EAX.
+    node->right->accept(this);
+    
+    // Pop into ECX.
+    memory_buffer_write_u8(&this->buffer,  0x59);
+
+    // CMP ECX, EAX
+    memory_buffer_write_u8(&this->buffer, 0x39);
+    memory_buffer_write_u8(&this->buffer, 0xC1);
+
+    switch (node->operation_type)
+    {
+
+        case OperationType::OPERATION_TYPE_LESS:
+        {
+
+            // SETL AL (less than)
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x9C);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+            
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_LESS_EQUAL:
+        {
+
+            // SETLE AL
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x9E);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_GREATER:
+        {
+
+            // SETG AL
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x9F);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_GREATER_EQUAL:
+        {
+
+            // SETGE AL
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x9D);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_EQUAL:
+        {
+
+            // SETE AL
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x94);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+
+        } break;
+
+        case OperationType::OPERATION_TYPE_NOT_EQUAL:
+        {
+
+            // SETNE AL
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x95);
+            memory_buffer_write_u8(&this->buffer, 0xC0);
+
+        } break;
+
+
+    }
 
 }
 
@@ -559,6 +734,31 @@ visit(SyntaxNodePrimary *node)
             memory_buffer_write_u8(&this->buffer,   (value >> 40) & 0xFF);
             memory_buffer_write_u8(&this->buffer,   (value >> 48) & 0xFF);
             memory_buffer_write_u8(&this->buffer,   (value >> 56) & 0xFF);
+
+        } break;
+
+        case PrimaryType::PRIMARY_TYPE_BOOLEAN:
+        {
+
+            string boolean_value = node->value;
+            i64 value = 0;
+
+            if (boolean_value == "true") value = 1;
+
+            // MOVE RAX, value
+            memory_buffer_write_u8(&this->buffer,   0x48);
+            memory_buffer_write_u8(&this->buffer,   0xB8);
+
+            // IMM64
+            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 32) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 40) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 48) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 56) & 0xFF);
+
 
         } break;
 

@@ -13,7 +13,7 @@ class Compiler
                     Compiler();
         virtual    ~Compiler();
         
-        bool        compile(string source, bool dump_reference);
+        bool        compile(string source, bool no_reference, bool no_generate, bool no_execute);
 
     protected:
         SyntaxParser    parser;

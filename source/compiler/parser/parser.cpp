@@ -512,7 +512,7 @@ shared_ptr<SyntaxNode> SyntaxParser::
 match_expression()
 {
     
-    shared_ptr<SyntaxNode> expression = this->match_term();
+    shared_ptr<SyntaxNode> expression = this->match_logical_or();
     
     auto node = this->create_node<SyntaxNodeExpression>();
     node->expression        = expression;
@@ -526,28 +526,192 @@ shared_ptr<SyntaxNode> SyntaxParser::
 match_logical_or()
 {
 
-    return nullptr;
+    shared_ptr<SyntaxNode> left = this->match_logical_and();
+
+    while (this->tokenizer.current_token_is(TokenType::TOKEN_OR))
+    {
+        
+        // Get the current toke type and then determine the operation.
+        TokenType type = this->tokenizer.get_current_token_type();
+        OperationType operation = OperationType::OPERATION_TYPE_LOGICAL_OR;
+        this->tokenizer.shift();
+        
+        // Get the right term.
+        auto right = this->match_logical_and();
+
+        if (left->evaluation_type != EvaluationType::EVALUATION_TYPE_BOOLEAN ||
+            right->evaluation_type != EvaluationType::EVALUATION_TYPE_BOOLEAN)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected non-boolean in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
+        
+        // Generate the node.
+        auto expression = this->create_node<SyntaxNodeLogical>();
+        expression->left            = left;
+        expression->right           = right;
+        expression->operation_type  = operation;
+        expression->evaluation_type = EvaluationType::EVALUATION_TYPE_BOOLEAN;
+        
+        left = expression;
+        
+    }
+    
+    return left;
+
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
 match_logical_and()
 {
 
-    return nullptr;
+    shared_ptr<SyntaxNode> left = this->match_logical_not();
+
+    while (this->tokenizer.current_token_is(TokenType::TOKEN_AND))
+    {
+        
+        // Get the current toke type and then determine the operation.
+        TokenType type = this->tokenizer.get_current_token_type();
+        OperationType operation = OperationType::OPERATION_TYPE_LOGICAL_AND;
+        this->tokenizer.shift();
+        
+        // Get the right term.
+        auto right = this->match_logical_not();
+
+        if (left->evaluation_type != EvaluationType::EVALUATION_TYPE_BOOLEAN ||
+            right->evaluation_type != EvaluationType::EVALUATION_TYPE_BOOLEAN)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected non-boolean in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
+        
+        // Generate the node.
+        auto expression = this->create_node<SyntaxNodeLogical>();
+        expression->left            = left;
+        expression->right           = right;
+        expression->operation_type  = operation;
+        expression->evaluation_type = EvaluationType::EVALUATION_TYPE_BOOLEAN;
+        
+        left = expression;
+        
+    }
+    
+    return left;
+
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
 match_logical_not()
 {
 
-    return nullptr;
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_NOT))
+    {
+
+        // Get the current toke type and then determine the operation.
+        TokenType type = this->tokenizer.get_current_token_type();
+        OperationType operation = OperationType::OPERATION_TYPE_LOGICAL_NOT;
+        this->tokenizer.shift();
+
+        // Righht.
+        auto right = this->match_relational();
+
+        if (right->evaluation_type != EvaluationType::EVALUATION_TYPE_BOOLEAN)
+        {
+
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected non-boolean in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+
+        }
+
+        // Generate the node.
+        auto expression = this->create_node<SyntaxNodeLogical>();
+        expression->left            = nullptr;
+        expression->right           = right;
+        expression->operation_type  = operation;
+        expression->evaluation_type = EvaluationType::EVALUATION_TYPE_BOOLEAN;
+        
+        return expression;
+
+    }
+
+    else
+    {
+
+        return this->match_relational();
+
+    }
+
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
 match_relational()
 {
 
-    return nullptr;
+    shared_ptr<SyntaxNode> left = this->match_term();
+
+    while  (this->tokenizer.current_token_is(TokenType::TOKEN_LESS) || 
+            this->tokenizer.current_token_is(TokenType::TOKEN_LESS_EQUAL) ||
+            this->tokenizer.current_token_is(TokenType::TOKEN_GREATER) ||
+            this->tokenizer.current_token_is(TokenType::TOKEN_GREATER_EQUAL) ||
+            this->tokenizer.current_token_is(TokenType::TOKEN_EQUAL) ||
+            this->tokenizer.current_token_is(TokenType::TOKEN_NOT_EQUAL))
+    {
+        
+        // Get the current toke type and then determine the operation.
+        TokenType type = this->tokenizer.get_current_token_type();
+        OperationType operation = OperationType::OPERATION_TYPE_NULL;
+        switch (type)
+        {
+            case TokenType::TOKEN_LESS:             operation = OperationType::OPERATION_TYPE_LESS; break;
+            case TokenType::TOKEN_LESS_EQUAL:       operation = OperationType::OPERATION_TYPE_LESS_EQUAL; break;
+            case TokenType::TOKEN_GREATER:          operation = OperationType::OPERATION_TYPE_GREATER; break;
+            case TokenType::TOKEN_GREATER_EQUAL:    operation = OperationType::OPERATION_TYPE_GREATER_EQUAL; break;
+            case TokenType::TOKEN_EQUAL:            operation = OperationType::OPERATION_TYPE_EQUAL; break;
+            case TokenType::TOKEN_NOT_EQUAL:        operation = OperationType::OPERATION_TYPE_NOT_EQUAL; break;
+            default: NOREACH("We should never reach this point."); break;
+        }
+
+        this->tokenizer.shift();
+        
+        // Get the right term.
+        auto right = this->match_term();
+
+        if (left->evaluation_type != EvaluationType::EVALUATION_TYPE_INT4 ||
+            right->evaluation_type != EvaluationType::EVALUATION_TYPE_INT4)
+        {
+            throw CompilerSyntaxErrorException(__LINE__, 
+                this->source_name,
+                this->tokenizer.get_previous_token().get_line(), 
+                this->tokenizer.get_previous_token().get_column(), 
+                "Unexpected string literal in expression: %s",
+                this->tokenizer.get_previous_token().get_reference().c_str());
+        }
+        
+        // Generate the node.
+        auto expression = this->create_node<SyntaxNodeRelational>();
+        expression->left            = left;
+        expression->right           = right;
+        expression->operation_type  = operation;
+        expression->evaluation_type = EvaluationType::EVALUATION_TYPE_BOOLEAN;
+        
+        left = expression;
+        
+    }
+    
+    return left;
+
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
@@ -815,7 +979,16 @@ match_primary()
             case TokenType::TOKEN_IDENTIFIER:
             {
 
-                if (!this->environment->symbol_exists(token.get_reference().c_str()))
+                if (token.get_reference() == "true" || token.get_reference() == "false")
+                {
+
+                    primary_type = PrimaryType::PRIMARY_TYPE_BOOLEAN;
+                    evaluation_type = EvaluationType::EVALUATION_TYPE_BOOLEAN;
+                    value = token.get_reference();
+
+                }
+
+                else if (!this->environment->symbol_exists(token.get_reference().c_str()))
                 {
 
                     throw CompilerSyntaxErrorException(__LINE__, 
@@ -828,9 +1001,13 @@ match_primary()
 
                 }
 
-                primary_type = PrimaryType::PRIMARY_TYPE_IDENTIFIER;
-                evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
-                value = token.get_reference();
+                else
+                {
+
+                    primary_type = PrimaryType::PRIMARY_TYPE_IDENTIFIER;
+                    evaluation_type = EvaluationType::EVALUATION_TYPE_INT4;
+                    value = token.get_reference();
+                }
 
             } break;
 

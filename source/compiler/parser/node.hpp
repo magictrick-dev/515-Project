@@ -18,6 +18,8 @@ enum class SyntaxNodeType
 
     SYNTAX_NODE_TYPE_EXPRESSION,
 
+    SYNTAX_NODE_TYPE_LOGICAL,
+    SYNTAX_NODE_TYPE_RELATIONAL,
     SYNTAX_NODE_TYPE_TERM,
     SYNTAX_NODE_TYPE_FACTOR,
     SYNTAX_NODE_TYPE_MAGNITUDE,
@@ -39,6 +41,15 @@ enum class OperationType
     OPERATION_TYPE_EXPONENT,
     OPERATION_TYPE_NEGATION,
     OPERATION_TYPE_POSITIVE,
+    OPERATION_TYPE_LOGICAL_AND,
+    OPERATION_TYPE_LOGICAL_OR,
+    OPERATION_TYPE_LOGICAL_NOT,
+    OPERATION_TYPE_LESS,
+    OPERATION_TYPE_LESS_EQUAL,
+    OPERATION_TYPE_GREATER,
+    OPERATION_TYPE_GREATER_EQUAL,
+    OPERATION_TYPE_EQUAL,
+    OPERATION_TYPE_NOT_EQUAL,
 };
 
 enum class PrimaryType
@@ -50,6 +61,7 @@ enum class PrimaryType
     PRIMARY_TYPE_FLOAT,
     PRIMARY_TYPE_STRING,
     PRIMARY_TYPE_IDENTIFIER,
+    PRIMARY_TYPE_BOOLEAN,
 
 };
 
@@ -62,6 +74,7 @@ enum class EvaluationType
     EVALUATION_TYPE_INT4,
     EVALUATION_TYPE_STRING_LITERAL,
     EVALUATION_TYPE_FLOAT,
+    EVALUATION_TYPE_BOOLEAN,
 
 };
 
@@ -76,6 +89,7 @@ inline string evaluation_type_to_string(EvaluationType type)
         case EvaluationType::EVALUATION_TYPE_INT4:              return "INT4";
         case EvaluationType::EVALUATION_TYPE_STRING_LITERAL:    return "STRING LITERAL";
         case EvaluationType::EVALUATION_TYPE_FLOAT:             return "FLOAT";
+        case EvaluationType::EVALUATION_TYPE_BOOLEAN:           return "BOOLEAN";
         default:
         {
             ENSURE(!"Whoops, reached unimplemented / uncaught type!");

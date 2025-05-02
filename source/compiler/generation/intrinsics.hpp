@@ -12,7 +12,7 @@ inline void print_int(int value)
 inline void print_bool(int value)
 {
 
-    std::cout << value;
+    std::cout << ((value & 0xFF) ? "true" : "false");
 
 }
 

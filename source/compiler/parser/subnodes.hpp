@@ -169,6 +169,51 @@ class SyntaxNodeExpression : public SyntaxNode
 
 };
 
+// --- Logical Syntax Node -----------------------------------------------------
+// 
+// Logical.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeLogical : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeLogical();
+        virtual        ~SyntaxNodeLogical();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        shared_ptr<SyntaxNode>  left;
+        shared_ptr<SyntaxNode>  right;
+        OperationType           operation_type;
+
+};
+
+// --- Relational Syntax Node --------------------------------------------------
+// 
+// Relational.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeRelational : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeRelational();
+        virtual        ~SyntaxNodeRelational();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        shared_ptr<SyntaxNode>  left;
+        shared_ptr<SyntaxNode>  right;
+        OperationType           operation_type;
+
+};
+
+
 // --- Term Syntax Node --------------------------------------------------------
 // 
 // Denotes a term in a mathematical expression.

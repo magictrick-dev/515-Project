@@ -52,6 +52,20 @@ runtime(int argc, char ** argv)
         return 1;
     }
 
+    bool no_reference = false;
+    bool no_generate = false;
+    bool no_execute = false;
+
+    for (int i = 1; i < argc; ++i)
+    {
+
+        string parameter = argv[i];
+        if (parameter == "--no-reference") no_reference = true;
+        if (parameter == "--no-generate") no_generate = true;
+        if (parameter == "--no-execute") no_execute = true;
+
+    }
+
     // --- Compiler Setup ------------------------------------------------------
     //
     // Initializes the compiler and prepares the source file for processing.
@@ -114,7 +128,10 @@ runtime(int argc, char ** argv)
 #endif
         
         Compiler compiler;
-        if (!compiler.compile(canonical_source_file.c_str(), true))
+        if (!compiler.compile(canonical_source_file.c_str(), 
+                    no_reference, 
+                    no_generate,
+                    no_execute))
         {
             std::cout << "-- Unable to fully compile, errors detected." << std::endl;
             return 1;

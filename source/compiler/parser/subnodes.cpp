@@ -184,6 +184,56 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- Relational Syntax Node --------------------------------------------------------
+
+SyntaxNodeRelational::
+SyntaxNodeRelational()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_RELATIONAL;
+    this->left = nullptr;
+    this->right = nullptr;
+    this->operation_type = OperationType::OPERATION_TYPE_NULL;
+
+}
+
+SyntaxNodeRelational::
+~SyntaxNodeRelational()
+{
+    
+}
+
+void SyntaxNodeRelational::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+// --- Logical Syntax Node --------------------------------------------------------
+
+SyntaxNodeLogical::
+SyntaxNodeLogical()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_LOGICAL;
+    this->left = nullptr;
+    this->right = nullptr;
+    this->operation_type = OperationType::OPERATION_TYPE_NULL;
+
+}
+
+SyntaxNodeLogical::
+~SyntaxNodeLogical()
+{
+    
+}
+
+void SyntaxNodeLogical::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
 // --- Term Syntax Node --------------------------------------------------------
 
 SyntaxNodeTerm::

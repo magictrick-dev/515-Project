@@ -51,6 +51,18 @@ visit(SyntaxNodeExpression *node)
 }
 
 void SyntaxNodeVisitor::
+visit(SyntaxNodeLogical *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
+visit(SyntaxNodeRelational *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
 visit(SyntaxNodeTerm *node)
 {
     return;

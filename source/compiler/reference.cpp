@@ -191,6 +191,62 @@ visit(SyntaxNodeExpression *node)
 }
 
 void ASTReferenceOutput::
+visit(SyntaxNodeLogical *node)
+{
+
+    this->print_tabs();
+    switch (node->operation_type)
+    {
+        case OperationType::OPERATION_TYPE_LOGICAL_OR: std::cout << "OR "; break;
+        case OperationType::OPERATION_TYPE_LOGICAL_AND: std::cout << "AND "; break;
+        case OperationType::OPERATION_TYPE_LOGICAL_NOT: std::cout << "NOT "; break;
+        default: NOREACH("Invalid operation type");
+    }
+
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
+
+    this->push_tabs();
+
+    // Not is unary.
+    if (node->operation_type != OperationType::OPERATION_TYPE_LOGICAL_NOT)
+    {
+        node->left->accept(this);
+    }
+
+    node->right->accept(this);
+
+    this->pop_tabs();
+
+}
+
+void ASTReferenceOutput::
+visit(SyntaxNodeRelational *node)
+{
+
+    this->print_tabs();
+    switch (node->operation_type)
+    {
+        case OperationType::OPERATION_TYPE_LESS: std::cout << "LESS "; break;
+        case OperationType::OPERATION_TYPE_LESS_EQUAL: std::cout << "LESS EQUALS"; break;
+        case OperationType::OPERATION_TYPE_GREATER: std::cout << "GREATER "; break;
+        case OperationType::OPERATION_TYPE_GREATER_EQUAL: std::cout << "GREATER EQUALS"; break;
+        case OperationType::OPERATION_TYPE_EQUAL: std::cout << "EQUAL"; break;
+        case OperationType::OPERATION_TYPE_NOT_EQUAL: std::cout << "NOT EQUAL"; break;
+        default: NOREACH("Invalid operation type");
+    }
+
+    std::cout << evaluation_type_to_string(node->evaluation_type) << std::endl;
+
+    this->push_tabs();
+
+    node->left->accept(this);
+    node->right->accept(this);
+
+    this->pop_tabs();
+
+}
+
+void ASTReferenceOutput::
 visit(SyntaxNodeTerm *node)
 {
     
