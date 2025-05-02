@@ -25,6 +25,8 @@ class CodeGenerator : public SyntaxNodeVisitor
         virtual void    visit(SyntaxNodePrintStatement *node) override;
         virtual void    visit(SyntaxNodeAssignmentStatement *node) override;
         virtual void    visit(SyntaxNodeExpressionStatement *node) override;
+        virtual void    visit(SyntaxNodeConditionalStatement *node) override;
+        virtual void    visit(SyntaxNodeWhileStatement *node) override;
         
         virtual void    visit(SyntaxNodeExpression *node) override;
         virtual void    visit(SyntaxNodeLogical *node) override;

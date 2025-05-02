@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/ncc",
-            "args": ["tests/test402.txt", ""],
+            "args": ["tests/test422.txt", ""],
             "environment": [{ "name": "config", "value": "Debug" }],
             "cwd": "${workspaceFolder}"
           }

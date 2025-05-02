@@ -240,6 +240,159 @@ visit(SyntaxNodePrintStatement *node)
 }
 
 void CodeGenerator::
+visit(SyntaxNodeConditionalStatement *node)
+{
+
+    // Load the boolean into AL.
+    node->condition->accept(this);
+
+    // TST AL, 0x01
+    memory_buffer_write_u8(&this->buffer, 0xA8);
+    memory_buffer_write_u8(&this->buffer, 0x01);
+
+    // JZ (32-bit) over right.
+    memory_buffer_write_u8(&this->buffer, 0x0F);
+    memory_buffer_write_u8(&this->buffer, 0x84);
+
+    u64 if_jump_offset = this->buffer.position;
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+
+    u64 if_current_offset = this->buffer.position; // Store current offset.
+    u64 else_jump_offset = 0;
+
+    for (auto node : node->conditional_if)
+    {
+
+        node->accept(this);
+
+    }
+
+    // If we have an else statement, we need to create a JMP statement
+    // to leap over the else statements.
+    if (node->conditional_else.empty() == false)
+    {
+
+        // JMP rel32
+        memory_buffer_write_u8(&this->buffer, 0xE9);
+
+        else_jump_offset = this->buffer.position;
+        memory_buffer_write_u8(&this->buffer, 0x00);
+        memory_buffer_write_u8(&this->buffer, 0x00);
+        memory_buffer_write_u8(&this->buffer, 0x00);
+        memory_buffer_write_u8(&this->buffer, 0x00);
+
+    }
+
+    u64 else_current_offset = this->buffer.position; // Store current offset;
+    i32 if_value = else_current_offset - if_current_offset;
+
+    // File in the size of the if false condition.
+    this->buffer.position = if_jump_offset;
+    memory_buffer_write_u8(&this->buffer, (if_value >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (if_value >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (if_value >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (if_value >> 24) & 0xFF);
+
+    this->buffer.position = else_current_offset;
+
+    if (node->conditional_else.empty() == false)
+    {
+
+        // Build the nodes.
+        for (auto node : node->conditional_else)
+        {
+            node->accept(this);
+        }
+
+        u64 else_exit_offset = this->buffer.position;
+
+        // Write in the jump distance.
+        i32 else_value = else_exit_offset - else_current_offset;
+        this->buffer.position = else_jump_offset;
+        memory_buffer_write_u8(&this->buffer, (else_value >>  0) & 0xFF);
+        memory_buffer_write_u8(&this->buffer, (else_value >>  8) & 0xFF);
+        memory_buffer_write_u8(&this->buffer, (else_value >> 16) & 0xFF);
+        memory_buffer_write_u8(&this->buffer, (else_value >> 24) & 0xFF);
+
+        this->buffer.position = else_exit_offset;
+
+    }
+    
+
+}
+
+void CodeGenerator::
+visit(SyntaxNodeWhileStatement *node)
+{
+
+    // JMP rel32
+    memory_buffer_write_u8(&this->buffer, 0xE9);
+
+    u64 jump_offset = this->buffer.position;
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    
+    u64 initial_offset = this->buffer.position;
+
+    for (auto node : node->statements)
+    {
+
+        node->accept(this);
+
+    }
+
+    u64 ending_position = this->buffer.position;
+
+    // Write the initial jump down.
+    this->buffer.position = jump_offset;
+    i32 jump_value = ending_position - initial_offset;
+    memory_buffer_write_u8(&this->buffer, (jump_value >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (jump_value >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (jump_value >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (jump_value >> 24) & 0xFF);
+
+    // Restore our ending position.
+    this->buffer.position = ending_position;
+
+    // Set AL.
+    node->condition->accept(this);
+
+    // TST AL, 0x01.
+    memory_buffer_write_u8(&this->buffer, 0xA8);
+    memory_buffer_write_u8(&this->buffer, 0x01);
+
+    // JNZ (32-bit) back up.
+    memory_buffer_write_u8(&this->buffer, 0x0F);
+    memory_buffer_write_u8(&this->buffer, 0x85);
+
+    u64 loop_jump_offset = this->buffer.position;
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+
+    // Final value offset.
+    u64 trailing_offset = this->buffer.position;
+    i32 loop_offset = trailing_offset - initial_offset;
+
+    this->buffer.position = loop_jump_offset;
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, 0x00);
+
+    // Restore our ending position.
+    this->buffer.position = trailing_offset;
+
+
+}
+
+void CodeGenerator::
 visit(SyntaxNodeAssignmentStatement *node)
 {
     
@@ -339,7 +492,6 @@ visit(SyntaxNodeLogical *node)
             // TST AL, 0x01.
             memory_buffer_write_u8(&this->buffer, 0xA8);
             memory_buffer_write_u8(&this->buffer, 0x01);
-
                                                         
             // JNZ (32-bit) over right.
             memory_buffer_write_u8(&this->buffer, 0x0F);

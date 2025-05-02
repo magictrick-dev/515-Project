@@ -292,6 +292,26 @@ match_statements()
 
             }
 
+            else if (current_token.get_reference() == "while")
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> while_statement = this->match_while_statement();
+                    return while_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    throw;
+
+                }
+
+            }
+
             else if (current_token.get_reference() == "int4")
             {
 
@@ -483,6 +503,79 @@ match_print_statement()
 }
 
 shared_ptr<SyntaxNode> SyntaxParser::
+match_while_statement()
+{
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_LEFT_PARENTHESES, __LINE__);
+
+    auto expression = this->match_expression();
+
+    this->consume_current_token_as(TokenType::TOKEN_RIGHT_PARENTHESES, __LINE__);
+
+    // Body statements.
+    std::vector<shared_ptr<SyntaxNode>> statements;
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_LEFT_BRACE))
+    {
+
+        this->consume_current_token_as(TokenType::TOKEN_LEFT_BRACE, __LINE__);
+
+        while (!this->tokenizer.current_token_is(TokenType::TOKEN_EOF))
+        {
+
+            if (this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_BRACE)) break;
+            
+            try
+            {
+                
+                shared_ptr<SyntaxNode> statement = this->match_statements();
+                statements.push_back(statement);
+
+            }
+            catch (CompilerException &exception)
+            {
+                
+                std::cout << exception.what() << std::endl;
+                this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+                continue;
+                
+            }
+            
+        }
+
+        this->consume_current_token_as(TokenType::TOKEN_RIGHT_BRACE, __LINE__);
+
+    }
+
+    else
+    {
+
+        try
+        {
+            
+            shared_ptr<SyntaxNode> statement = this->match_statements();
+            statements.push_back(statement);
+
+        }
+        catch (CompilerException &exception)
+        {
+            
+            std::cout << exception.what() << std::endl;
+            this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+            
+        }
+
+    }
+
+    auto while_node = this->create_node<SyntaxNodeWhileStatement>();
+    while_node->condition = expression;
+    while_node->statements = statements;
+    return while_node;
+    
+
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
 match_conditional_statement()
 {
 
@@ -495,13 +588,15 @@ match_conditional_statement()
 
     // Matching all if statements.
     std::vector<shared_ptr<SyntaxNode>> if_statements;
-    if (this->tokenizer.current_token_is(TokenType::TOKEN_LEFT_BRACKET))
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_LEFT_BRACE))
     {
+
+        this->consume_current_token_as(TokenType::TOKEN_LEFT_BRACE, __LINE__);
 
         while (!this->tokenizer.current_token_is(TokenType::TOKEN_EOF))
         {
 
-            if (this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_BRACKET)) break;
+            if (this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_BRACE)) break;
             
             try
             {
@@ -520,6 +615,8 @@ match_conditional_statement()
             }
             
         }
+
+        this->consume_current_token_as(TokenType::TOKEN_RIGHT_BRACE, __LINE__);
 
     }
 
@@ -542,6 +639,77 @@ match_conditional_statement()
         }
 
     }
+
+    // Else statements.
+    std::vector<shared_ptr<SyntaxNode>> else_statements;
+    Token current_token = this->tokenizer.get_current_token();
+    string current_reference = current_token.get_reference();
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_IDENTIFIER) && current_reference == "else")
+    {
+
+        this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+
+        if (this->tokenizer.current_token_is(TokenType::TOKEN_LEFT_BRACE))
+        {
+
+            this->consume_current_token_as(TokenType::TOKEN_LEFT_BRACE, __LINE__);
+
+            while (!this->tokenizer.current_token_is(TokenType::TOKEN_EOF))
+            {
+
+                if (this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_BRACE)) break;
+                
+                try
+                {
+                    
+                    shared_ptr<SyntaxNode> statement = this->match_statements();
+                    else_statements.push_back(statement);
+
+                }
+                catch (CompilerException &exception)
+                {
+                    
+                    std::cout << exception.what() << std::endl;
+                    this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+                    continue;
+                    
+                }
+                
+            }
+
+            this->consume_current_token_as(TokenType::TOKEN_RIGHT_BRACE, __LINE__);
+
+        }
+
+        else
+        {
+
+            try
+            {
+                
+                shared_ptr<SyntaxNode> statement = this->match_statements();
+                else_statements.push_back(statement);
+
+            }
+            catch (CompilerException &exception)
+            {
+                
+                std::cout << exception.what() << std::endl;
+                this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+                
+            }
+
+        }
+            
+
+    }
+
+    auto conditional_node = this->create_node<SyntaxNodeConditionalStatement>();
+    conditional_node->condition = expression;
+    conditional_node->conditional_if = if_statements;
+    conditional_node->conditional_else = else_statements;
+    return conditional_node;
+    
 
 }
 

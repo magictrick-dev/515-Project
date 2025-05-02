@@ -146,16 +146,21 @@ visit(SyntaxNodeConditionalStatement *node)
 
     this->push_tabs();
     node->condition->accept(this);
+
+    this->print_tabs();
+    std::cout << "CONDITIONAL BODY" << std::endl;
     this->push_tabs();
     for (auto node : node->conditional_if)
     {
         node->accept(this);
     }
     this->pop_tabs();
+    this->pop_tabs();
 
     if (node->conditional_else.empty() == false)
     {
 
+        this->print_tabs();
         std::cout << "CONDITIONAL ELSE STATEMENT" << std::endl;
         this->push_tabs();
         for (auto node : node->conditional_else)
@@ -177,11 +182,17 @@ visit(SyntaxNodeWhileStatement *node)
 
     this->push_tabs();
     node->condition->accept(this);
+
+    this->print_tabs();
+    std::cout << "WHILE BODY" << std::endl;
+
     this->push_tabs();
     for (auto node : node->statements)
     {
         node->accept(this);
     }
+
+    this->pop_tabs();
     this->pop_tabs();
 
 }
@@ -211,7 +222,7 @@ visit(SyntaxNodeAssignmentStatement *node)
 {
     
     this->print_tabs();
-    std::cout << "ASSIGNMENT STATEMENT " << node->variable_name << " ";
+    std::cout << "ASSIGNMENT STATEMENT " << node->variable_name << std::endl;
     this->push_tabs();
     node->expression->accept(this);
     this->pop_tabs();
