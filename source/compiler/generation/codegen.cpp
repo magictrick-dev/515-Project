@@ -302,7 +302,6 @@ visit(SyntaxNodeLogical *node)
             memory_buffer_write_u8(&this->buffer, 0xA8);
             memory_buffer_write_u8(&this->buffer, 0x01);
 
-            u64 current_offset = this->buffer.position; // Store current offset.
                                                         
             // JNZ (32-bit) over right.
             memory_buffer_write_u8(&this->buffer, 0x0F);
@@ -313,6 +312,8 @@ visit(SyntaxNodeLogical *node)
             memory_buffer_write_u8(&this->buffer, 0x00);
             memory_buffer_write_u8(&this->buffer, 0x00);
             memory_buffer_write_u8(&this->buffer, 0x00);
+
+            u64 current_offset = this->buffer.position; // Store current offset.
 
             // Places result into AL.
             node->right->accept(this);
@@ -332,11 +333,50 @@ visit(SyntaxNodeLogical *node)
 
         case OperationType::OPERATION_TYPE_LOGICAL_AND:
         {
+            // Places result into AL (not EAX).
+            node->left->accept(this);
+
+            // TST AL, 0x01.
+            memory_buffer_write_u8(&this->buffer, 0xA8);
+            memory_buffer_write_u8(&this->buffer, 0x01);
+
+                                                        
+            // JNZ (32-bit) over right.
+            memory_buffer_write_u8(&this->buffer, 0x0F);
+            memory_buffer_write_u8(&this->buffer, 0x84);
+
+            u64 jump_offset = this->buffer.position;
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+            memory_buffer_write_u8(&this->buffer, 0x00);
+
+            u64 current_offset = this->buffer.position; // Store current offset.
+
+            // Places result into AL.
+            node->right->accept(this);
+
+            u64 ending_offset = this->buffer.position; // Ending offset.
+            i32 value = (ending_offset - current_offset);
+            this->buffer.position = jump_offset;
+            memory_buffer_write_u8(&this->buffer,   (value >>  0) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >>  8) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 16) & 0xFF);
+            memory_buffer_write_u8(&this->buffer,   (value >> 24) & 0xFF);
+
+            this->buffer.position = ending_offset; // Restore our position.
 
         } break;
 
         case OperationType::OPERATION_TYPE_LOGICAL_NOT:
         {
+
+            // Since a logical not only has a right hand operand...
+            node->right->accept(this);
+
+            // XOR al, 0x01;
+            memory_buffer_write_u8(&this->buffer, 0x34);
+            memory_buffer_write_u8(&this->buffer, 0x01);
 
         } break;
 

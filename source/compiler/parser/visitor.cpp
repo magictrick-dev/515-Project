@@ -32,6 +32,18 @@ visit(SyntaxNodePrintStatement *node)
 }
 
 void SyntaxNodeVisitor::
+visit(SyntaxNodeWhileStatement *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
+visit(SyntaxNodeConditionalStatement *node)
+{
+    return;
+}
+
+void SyntaxNodeVisitor::
 visit(SyntaxNodeAssignmentStatement *node)
 {
     return;

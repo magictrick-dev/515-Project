@@ -92,6 +92,49 @@ accept(SyntaxNodeVisitor *visitor)
     visitor->visit(this);
 }
 
+// --- While Statement Syntax Node ---------------------------------------------
+
+SyntaxNodeWhileStatement::
+SyntaxNodeWhileStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_WHILE_STATEMENT;
+
+}
+
+SyntaxNodeWhileStatement::
+~SyntaxNodeWhileStatement()
+{
+    
+}
+
+void SyntaxNodeWhileStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
+// --- If Statement Syntax Node ------------------------------------------------
+
+SyntaxNodeConditionalStatement::
+SyntaxNodeConditionalStatement()
+{
+
+    this->node_type = SyntaxNodeType::SYNTAX_NODE_TYPE_CONDITIONAL_STATEMENT;
+
+}
+
+SyntaxNodeConditionalStatement::
+~SyntaxNodeConditionalStatement()
+{
+    
+}
+
+void SyntaxNodeConditionalStatement::
+accept(SyntaxNodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
 
 // --- Print Statement Syntax Node ---------------------------------------------
 

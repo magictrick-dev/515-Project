@@ -272,6 +272,26 @@ match_statements()
 
             }
 
+            else if (current_token.get_reference() == "if")
+            {
+
+                try
+                {
+
+                    shared_ptr<SyntaxNode> conditional_statement = this->match_conditional_statement();
+                    return conditional_statement;
+
+                }
+
+                catch (CompilerException &exception)
+                {
+
+                    throw;
+
+                }
+
+            }
+
             else if (current_token.get_reference() == "int4")
             {
 
@@ -459,6 +479,69 @@ match_print_statement()
     auto print_statement = this->create_node<SyntaxNodePrintStatement>();
     print_statement->expressions = expressions;
     return print_statement;
+
+}
+
+shared_ptr<SyntaxNode> SyntaxParser::
+match_conditional_statement()
+{
+
+    this->consume_current_token_as(TokenType::TOKEN_IDENTIFIER, __LINE__);
+    this->consume_current_token_as(TokenType::TOKEN_LEFT_PARENTHESES, __LINE__);
+
+    auto expression = this->match_expression();
+
+    this->consume_current_token_as(TokenType::TOKEN_RIGHT_PARENTHESES, __LINE__);
+
+    // Matching all if statements.
+    std::vector<shared_ptr<SyntaxNode>> if_statements;
+    if (this->tokenizer.current_token_is(TokenType::TOKEN_LEFT_BRACKET))
+    {
+
+        while (!this->tokenizer.current_token_is(TokenType::TOKEN_EOF))
+        {
+
+            if (this->tokenizer.current_token_is(TokenType::TOKEN_RIGHT_BRACKET)) break;
+            
+            try
+            {
+                
+                shared_ptr<SyntaxNode> statement = this->match_statements();
+                if_statements.push_back(statement);
+
+            }
+            catch (CompilerException &exception)
+            {
+                
+                std::cout << exception.what() << std::endl;
+                this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+                continue;
+                
+            }
+            
+        }
+
+    }
+
+    else
+    {
+
+        try
+        {
+            
+            shared_ptr<SyntaxNode> statement = this->match_statements();
+            if_statements.push_back(statement);
+
+        }
+        catch (CompilerException &exception)
+        {
+            
+            std::cout << exception.what() << std::endl;
+            this->synchronize_to(TokenType::TOKEN_SEMICOLON);
+            
+        }
+
+    }
 
 }
 

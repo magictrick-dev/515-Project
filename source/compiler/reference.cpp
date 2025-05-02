@@ -138,6 +138,55 @@ visit(SyntaxNodeReadStatement *node)
 }
 
 void ASTReferenceOutput::
+visit(SyntaxNodeConditionalStatement *node)
+{
+
+    this->print_tabs();
+    std::cout << "CONDITIONAL IF STATEMENT" << std::endl;
+
+    this->push_tabs();
+    node->condition->accept(this);
+    this->push_tabs();
+    for (auto node : node->conditional_if)
+    {
+        node->accept(this);
+    }
+    this->pop_tabs();
+
+    if (node->conditional_else.empty() == false)
+    {
+
+        std::cout << "CONDITIONAL ELSE STATEMENT" << std::endl;
+        this->push_tabs();
+        for (auto node : node->conditional_else)
+        {
+            node->accept(this);
+        }
+        this->pop_tabs();
+
+    }
+
+}
+
+void ASTReferenceOutput::
+visit(SyntaxNodeWhileStatement *node)
+{
+
+    this->print_tabs();
+    std::cout << "WHILE STATEMENT" << std::endl;
+
+    this->push_tabs();
+    node->condition->accept(this);
+    this->push_tabs();
+    for (auto node : node->statements)
+    {
+        node->accept(this);
+    }
+    this->pop_tabs();
+
+}
+
+void ASTReferenceOutput::
 visit(SyntaxNodePrintStatement *node)
 {
 

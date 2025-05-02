@@ -106,7 +106,49 @@ class SyntaxNodePrintStatement : public SyntaxNode
 
 };
 
-// --- Assignment Statement Syntax Node -----------------------------------------
+// --- While Statement Syntax Node ---------------------------------------------
+//
+// While nodes.
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeWhileStatement : public SyntaxNode
+{
+    public:
+                        SyntaxNodeWhileStatement();
+        virtual        ~SyntaxNodeWhileStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        shared_ptr<SyntaxNode> condition;
+        std::vector<shared_ptr<SyntaxNode>> statements;
+
+};
+
+// --- Conditional Statement Syntax Node ---------------------------------------
+//
+// Conditional nodes (if/else).
+//
+// -----------------------------------------------------------------------------
+
+class SyntaxNodeConditionalStatement : public SyntaxNode
+{
+
+    public:
+                        SyntaxNodeConditionalStatement();
+        virtual        ~SyntaxNodeConditionalStatement();
+
+        virtual void    accept(SyntaxNodeVisitor *visitor) override;
+        
+    public:
+        shared_ptr<SyntaxNode> condition;
+        std::vector<shared_ptr<SyntaxNode>> conditional_if;
+        std::vector<shared_ptr<SyntaxNode>> conditional_else;
+
+};
+
+// --- Assignment Statement Syntax Node ----------------------------------------
 // 
 // Represents a single expression statement.
 //
