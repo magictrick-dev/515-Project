@@ -381,10 +381,10 @@ visit(SyntaxNodeWhileStatement *node)
     i32 loop_offset = trailing_offset - initial_offset;
 
     this->buffer.position = loop_jump_offset;
-    memory_buffer_write_u8(&this->buffer, 0x00);
-    memory_buffer_write_u8(&this->buffer, 0x00);
-    memory_buffer_write_u8(&this->buffer, 0x00);
-    memory_buffer_write_u8(&this->buffer, 0x00);
+    memory_buffer_write_u8(&this->buffer, (loop_offset >>  0) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (loop_offset >>  8) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (loop_offset >> 16) & 0xFF);
+    memory_buffer_write_u8(&this->buffer, (loop_offset >> 24) & 0xFF);
 
     // Restore our ending position.
     this->buffer.position = trailing_offset;
