@@ -1,2 +1,2 @@
-./ncc ./tests/test151.txt
+./build/ncc ./tests/test424.txt
 

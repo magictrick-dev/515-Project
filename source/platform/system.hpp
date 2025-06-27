@@ -3,7 +3,7 @@
 #include <definitions.hpp>
 #include <utilities/buffer.hpp>
 
-memory_buffer   system_virtual_allocate(vptr offset, u64 size);
+memory_buffer   system_virtual_allocate(vptr offset, u64 size, bool executable = false);
 void            system_virtual_free(vptr ptr, u64 size);
 u64             system_virtual_page_size();
 ccptr           system_get_current_working_directory();

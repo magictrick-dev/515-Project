@@ -1,5 +1,6 @@
 #include <utilities/intrinsics.hpp>
-#include <iostream>
+#include <cstdarg>
+#include <cstdio>
 
 void 
 intrinsic_memory_copy_simple(void* destination, void* source, uint64_t size)
@@ -102,5 +103,29 @@ intrinsic_codepoint_to_utf8(u32 codepoint, cptr output)
         // Invalid code point.
         output[0] = '\0';
     }
+
+}
+
+void
+intrinsic_sscanf(ccptr string, ccptr format, ...)
+{
+
+    va_list args;
+    va_start(args, format);
+
+    // Windows.
+#   if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__)
+    {
+        sscanf_s(string, format, args);
+    }
+
+    // Literally everyone else.
+#   else
+    {
+        sscanf(string, format, args);
+    }
+#   endif
+
+    va_end(args);
 
 }

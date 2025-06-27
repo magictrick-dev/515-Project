@@ -1,7 +1,7 @@
+#include <filesystem>
 #include <utilities/filepath.hpp>
 #include <platform/system.hpp>
 #include <platform/filesystem.hpp>
-#include <filesystem>
 
 filepath::
 filepath()
@@ -216,8 +216,7 @@ canonicalize() const
 
     // Ew, but I am way too lazy to write this function.
     try {
-        return std::filesystem::canonical(this->file_path.c_str())
-            .string().c_str();
+        return std::filesystem::weakly_canonical(this->file_path.c_str()).string().c_str();
     } catch (const std::filesystem::filesystem_error& e) {
         return this->file_path;
     }

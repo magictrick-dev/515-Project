@@ -2,14 +2,18 @@
 #include <windows.h>
 
 memory_buffer 
-system_virtual_allocate(vptr offset, u64 size)
+system_virtual_allocate(vptr offset, u64 size, bool executable)
 {
     
     // Round to the nearest page size.
     u64 page_size = system_virtual_page_size();
     u64 required_size = size + (page_size - (size % page_size));
     
-    LPVOID result = VirtualAlloc(offset, required_size, MEM_COMMIT|MEM_RESERVE, PAGE_READWRITE);
+    DWORD protection = PAGE_READWRITE;
+    if (executable)
+        protection = PAGE_EXECUTE_READWRITE;
+    
+    LPVOID result = VirtualAlloc(offset, required_size, MEM_COMMIT|MEM_RESERVE, protection);
     ENSURE(result != nullptr);
 
     memory_buffer buff = {0};

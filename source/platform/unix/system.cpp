@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 
 memory_buffer      
-system_virtual_allocate(vptr offset, u64 size)
+system_virtual_allocate(vptr offset, u64 size, bool executable)
 {
 
     // In case the user does something silly.
@@ -17,9 +17,13 @@ system_virtual_allocate(vptr offset, u64 size)
 
     // Round the request size up to the page size.
     u64 actual_size = size + (system_virtual_page_size() - (size % system_virtual_page_size()));
+    
+    u32 flags = PROT_READ | PROT_WRITE;
+    if (executable)
+        flags |= PROT_EXEC;
 
     // Allocate the memory.
-    vptr ptr = mmap(offset, actual_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    vptr ptr = mmap(offset, actual_size, flags, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
     // Ensure the memory was allocated.
     ENSURE_PTR(ptr);
